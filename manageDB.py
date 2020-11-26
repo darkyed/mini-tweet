@@ -57,6 +57,8 @@ class sqliteDB:
         
         return False
     
+    
+    
     def add_user(self, user:User, password):
         h = user.handle
 
@@ -64,6 +66,40 @@ class sqliteDB:
             
         self.cur.execute(insert_command,(user.name, user.handle, password))
         self.commit_changes()
+    
+    def get_following_list(self,user):
+        self.cur.execute("SELECT gawd FROM follows where follower=?", (user.handle,))
+        return self.cur.fetchall()
+    
+    def get_tweets(self,handle):
+        select_command = "SELECT * FROM tweets WHERE handle=?"
+        t = (handle,)
+        self.cur.execute(select_command,t)
+        return  self.cur.fetchall()
+    
+    def delete_follower(self,user:User, handle):
+        user_handle=user.handle
+        self.cur.execute("DELETE FROM follows where gawd=? and follower=?", (handle, user_handle,))
+        self.commit_changes()
+        
+    def add_follower(self,user:User, handle):
+        if not self.following_exists(user,handle):
+            user_handle=user.handle
+            self.cur.execute("INSERT into follows VALUES (?, ?)", (handle, user_handle,))    
+            self.commit_changes()
+        else:
+            print("Already following")
+    
+    def following_exists(self,user:User,following_handle):
+        handle=user.handle
+        select_command = "SELECT handle FROM follows WHERE gawd=? and follower=?"
+        t = (following_handle,handle,)
+        self.cur.execute(select_command,t)
+        if self.cur.fetchone():
+            return True
+        
+        return False
+
 
         
     

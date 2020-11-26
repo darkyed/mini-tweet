@@ -67,6 +67,39 @@ class Interaction:
         password = input("Enter your password: ")
         user = User(name, handle)
         Authenticate.registerUser(user, password)
+    
+    @staticmethod
+    def get_feed(user,s,top_tweets=10):
+        following_list=s.get_following_list(user)
+        tweets=[]
+        for following in following_list:
+            tweets.append(s.get_tweets(following))
+        tweets=[(tweet.timestamp,tweet) for tweet in tweets]
+        tweets.sort(reverse=True)
+        return tweets[top_tweets]
+
+    @staticmethod
+    def follow_someone(user,follow_handle,s):
+        if s.user_exists(follow_handle):
+            if not s.following_exists(user,follow_handle):
+                s.add_follower(user,follow_handle)
+            else:
+                return "You already follow him/her"
+        else:
+            return "No such user exists"
+
+    @staticmethod
+    def unfollow_someone(user,follow_handle,s):
+        if s.user_exists(follow_handle):
+            if s.following_exists(user,follow_handle):
+                s.delete_follower(user,follow_handle)
+            else:
+                return "You don't follow him/her"
+        else:
+            return "No such user exists"
+
+    def get_hashtags(hashtag,s):
+        if 
 
 
 
