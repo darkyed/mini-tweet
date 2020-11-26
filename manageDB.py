@@ -72,6 +72,27 @@ class sqliteDB:
         
         return False
     
+    def verify_login(self, handle, password):
+        select_command = "SELECT password FROM users WHERE handle=? and password=?"
+        t = (handle,password,)
+        self.cur.execute(select_command,t)
+        if self.cur.fetchone():
+            return True
+        
+        return False
+    
+    def getUserViaHandle(self, handle):
+        '''
+        input: handle
+        output: tuple(name,handle)
+        '''
+        select_command = "SELECT name FROM users WHERE handle=?"
+        t = (handle,)
+        self.cur.execute(select_command,t)
+        res = self.cur.fetchone()
+        
+        return (res[0], handle)
+
     
     
     def add_user(self, user:User, password):

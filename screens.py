@@ -33,6 +33,7 @@ class Interaction:
             8. LOG-OUT
             """
         )
+
         option = 0
         try:
             option = int(input("Choose from [1-8]: "))
@@ -77,9 +78,7 @@ class Interaction:
             tweets.append(s.get_tweets(following[0]))
         print(tweets)
         return
-        tweets=[(tweet.timestamp,tweet) for tweet in tweets]
-        tweets.sort(reverse=True)
-        return tweets[top_tweets]
+
 
     @staticmethod
     def follow_someone(user,follow_handle,s):
@@ -124,27 +123,22 @@ class Authenticate:
     
     @staticmethod
     def logInUser(handle, password):
-        if handle=='yo' and password=='oy':
+        s = sqliteDB()
+        if s.verify_login(handle, password):
             print("---Logged In---")
-            # user = getUserViaHandle(handle)
-            # Authenticate.redirectToHomeScreen(user)
+            user = s.getUserViaHandle(handle)
+            user = User(*user)
+            Authenticate.redirectToHomeScreen(user, s)
         else:
             print("\nSorry wrong credentials, try again!")
             Interaction.logInScreen()
-
-            
-        # if (user.handle in db):
-        #     if db.user.password == password:
-        #         redirectToHomeScreen(user)
-        # else:
-        #     print("Sorry wrong credentials")
-        #     Interaction.logInScreen()
     
     @staticmethod
     def loggedInChoice(user, option):
-        if option==7:
+        if option==8:
             print("\nLOGGED OUT--------")
             pass
+        # TODO features [1-7] to be  completed by Peeyush
         # else:
         #     print('not log out')
 
