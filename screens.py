@@ -25,7 +25,7 @@ class Interaction:
         text = input("Enter your text: ")
         s.add_tweet(user, text)
         print("Posted your tweet to timeline: %s. . ." % text[:20])
-        Interaction.loggedInOptions()
+        Interaction.loggedInOptions(user,s)
     
     
     @staticmethod

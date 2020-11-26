@@ -27,6 +27,9 @@ class sqliteDB:
         self.cur = self.conn.cursor()
     
     def create_table(self, table_name="users"):
+        '''
+        table_name: "users", "tweets", "follows", "hashtags"
+        '''
         if table_name=="users":
             self.cur.execute("""
                 CREATE TABLE IF NOT EXISTS users (

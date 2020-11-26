@@ -4,6 +4,9 @@ from manageDB import sqliteDB
 
 db = sqliteDB()
 
-db.create_table()
+tables = ["users", "tweets", "follows", "hashtags"]
+
+for table in tables:
+    db.create_table(table_name=table)
 
 interact.welcome()
