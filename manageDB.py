@@ -13,14 +13,11 @@ from User import User
 #     tweet_text: 
 
 # Follows:
-#     A(follower): handle
-#     B(following): handle
+#     A(follower): handle : both foreign-key
+#     B(following): handle : both foreign-key
 
 # Hashtags:
 #     tweet_id: id ----> correspoding hashtag
-    
-
-
 
 
 class sqliteDB:
@@ -34,16 +31,34 @@ class sqliteDB:
             self.cur.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     name text,
-                    handle text,
+                    handle text PRIMARY KEY,
                     password text)
                 """)
         
         if table_name=="tweets":
             self.cur.execute("""
                 CREATE TABLE IF NOT EXISTS tweets (
-                    tweet_id text,
+                    tweet_id integer PRIMARY KEY AUTOINCREMENT,
                     tweet_text text,
-                    author text)
+                    author text,
+                    FOREIGN KEY(author) REFERENCES users(handle))
+                """)
+
+        if table_name=="follows":
+            self.cur.execute("""
+                CREATE TABLE IF NOT EXISTS follows (
+                    follower text,
+                    gawd text,
+                    FOREIGN KEY(follower) REFERENCES users(handle)),
+                    FOREIGN KEY(gawd) REFERENCES users(handle))
+                """)
+        
+        if table_name=="hashtags":
+            self.cur.execute("""
+                CREATE TABLE IF NOT EXISTS hashtags (
+                    tag text,
+                    t_id integer,
+                    FOREIGN KEY(t_id) REFERENCES tweets(tweet_id))
                 """)
         
         self.commit_changes()
@@ -67,6 +82,7 @@ class sqliteDB:
         self.cur.execute(insert_command,(user.name, user.handle, password))
         self.commit_changes()
     
+<<<<<<< HEAD
     def get_following_list(self,user):
         self.cur.execute("SELECT gawd FROM follows where follower=?", (user.handle,))
         return self.cur.fetchall()
@@ -100,7 +116,16 @@ class sqliteDB:
         
         return False
 
+=======
 
+    def add_tweet(self, user:User, tweet_text):
+>>>>>>> d73f2b40c7c2884d8d7c10343abf22111fa9b6a8
+
+        insert_command = "INSERT INTO tweets (tweet_text, author) VALUES (?, ?)"
+            
+        self.cur.execute(insert_command,(tweet_text, user.handle))
+        self.commit_changes()
+    
         
     
     def commit_changes(self):
