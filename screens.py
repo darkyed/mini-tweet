@@ -18,9 +18,18 @@ class Interaction:
         if option==2:
             Interaction.registerScreen()
     
+
+    @staticmethod
+    def tweet(user:User, s:sqliteDB):
+        print("\nYou chose to tweet!-----")
+        text = input("Enter your text: ")
+        s.add_tweet(user, text)
+        print("Posted your tweet to timeline: %s. . ." % text[:20])
+        Interaction.loggedInOptions()
+    
     
     @staticmethod
-    def loggedInOptions(user):
+    def loggedInOptions(user, sqldb):
         print(
             """
             1. Tweet
@@ -39,12 +48,12 @@ class Interaction:
             option = int(input("Choose from [1-8]: "))
         except:
             print("Invalid choice")
-            Interaction.loggedInOptions(user)
+            Interaction.loggedInOptions(user,sqldb)
         if not (0<option<9):
             print("Invalid choice")
-            Interaction.loggedInOptions(user)
+            Interaction.loggedInOptions(user,sqldb)
         else:
-            Authenticate.loggedInChoice(user, option)
+            Authenticate.loggedInChoice(user, option, sqldb)
     
 
     @staticmethod
@@ -118,6 +127,7 @@ class Authenticate:
 
         except Exception as e:
             print("\n" + e)
+            s.close_connection()
             Interaction.registerScreen()
 
     
@@ -133,11 +143,15 @@ class Authenticate:
             print("\nSorry wrong credentials, try again!")
             Interaction.logInScreen()
     
+
     @staticmethod
-    def loggedInChoice(user, option):
+    def loggedInChoice(user, option, s:sqliteDB):
         if option==8:
             print("\nLOGGED OUT--------")
-            pass
+            s.close_connection()
+            
+        elif option==1:
+            Interaction.tweet(user, s)
         # TODO features [1-7] to be  completed by Peeyush
         # else:
         #     print('not log out')
@@ -148,9 +162,4 @@ class Authenticate:
         print("\nHi, %s!" % user.handle)
         print("What would you like to do?")
         
-        Interaction.loggedInOptions(user)
-        # if user.loggedIn:
-        #     getContents(user)
-        # else:
-        #     raise "User no Logged In"
-    
+        Interaction.loggedInOptions(user, sqldb)
