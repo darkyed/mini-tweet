@@ -49,7 +49,7 @@ class sqliteDB:
                 CREATE TABLE IF NOT EXISTS follows (
                     follower text,
                     gawd text,
-                    FOREIGN KEY(follower) REFERENCES users(handle)),
+                    FOREIGN KEY(follower) REFERENCES users(handle),
                     FOREIGN KEY(gawd) REFERENCES users(handle))
                 """)
         
@@ -82,33 +82,31 @@ class sqliteDB:
         self.cur.execute(insert_command,(user.name, user.handle, password))
         self.commit_changes()
     
-<<<<<<< HEAD
     def get_following_list(self,user):
         self.cur.execute("SELECT gawd FROM follows where follower=?", (user.handle,))
         return self.cur.fetchall()
     
     def get_tweets(self,handle):
-        select_command = "SELECT * FROM tweets WHERE handle=?"
+        select_command = "SELECT * FROM tweets WHERE author=?"
         t = (handle,)
         self.cur.execute(select_command,t)
         return  self.cur.fetchall()
     
-    def delete_follower(self,user:User, handle):
-        user_handle=user.handle
-        self.cur.execute("DELETE FROM follows where gawd=? and follower=?", (handle, user_handle,))
+    def delete_follow(self,user:User, following:User):
+        self.cur.execute("DELETE FROM follows where gawd=? and follower=?", (following.handle, user.handle,))
         self.commit_changes()
         
-    def add_follower(self,user:User, handle):
-        if not self.following_exists(user,handle):
-            user_handle=user.handle
-            self.cur.execute("INSERT into follows VALUES (?, ?)", (handle, user_handle,))    
+    def add_follow(self,user:User, following:User):
+        if not self.following_exists(user,following):
+            self.cur.execute("INSERT into follows VALUES (?, ?)", (user.handle,following.handle,))    
             self.commit_changes()
         else:
             print("Already following")
     
-    def following_exists(self,user:User,following_handle):
+    def following_exists(self,user:User,following:User):
         handle=user.handle
-        select_command = "SELECT handle FROM follows WHERE gawd=? and follower=?"
+        following_handle=following.handle
+        select_command = "SELECT * FROM follows WHERE gawd=? and follower=?"
         t = (following_handle,handle,)
         self.cur.execute(select_command,t)
         if self.cur.fetchone():
@@ -116,10 +114,8 @@ class sqliteDB:
         
         return False
 
-=======
 
     def add_tweet(self, user:User, tweet_text):
->>>>>>> d73f2b40c7c2884d8d7c10343abf22111fa9b6a8
 
         insert_command = "INSERT INTO tweets (tweet_text, author) VALUES (?, ?)"
             

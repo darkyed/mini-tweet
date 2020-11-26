@@ -71,9 +71,12 @@ class Interaction:
     @staticmethod
     def get_feed(user,s,top_tweets=10):
         following_list=s.get_following_list(user)
+        print(following_list)
         tweets=[]
         for following in following_list:
-            tweets.append(s.get_tweets(following))
+            tweets.append(s.get_tweets(following[0]))
+        print(tweets)
+        return
         tweets=[(tweet.timestamp,tweet) for tweet in tweets]
         tweets.sort(reverse=True)
         return tweets[top_tweets]
@@ -82,7 +85,7 @@ class Interaction:
     def follow_someone(user,follow_handle,s):
         if s.user_exists(follow_handle):
             if not s.following_exists(user,follow_handle):
-                s.add_follower(user,follow_handle)
+                s.add_follow(user,follow_handle)
             else:
                 return "You already follow him/her"
         else:
@@ -92,14 +95,14 @@ class Interaction:
     def unfollow_someone(user,follow_handle,s):
         if s.user_exists(follow_handle):
             if s.following_exists(user,follow_handle):
-                s.delete_follower(user,follow_handle)
+                s.delete_follow(user,follow_handle)
             else:
                 return "You don't follow him/her"
         else:
             return "No such user exists"
 
-    def get_hashtags(hashtag,s):
-        if 
+    # def get_hashtags(hashtag,s):
+    #     if 
 
 
 
@@ -142,14 +145,15 @@ class Authenticate:
         if option==7:
             print("\nLOGGED OUT--------")
             pass
-        else:
-            print('not log out')
+        # else:
+        #     print('not log out')
 
     
     @staticmethod
     def redirectToHomeScreen(user, sqldb):
         print("\nHi, %s!" % user.handle)
         print("What would you like to do?")
+        
         Interaction.loggedInOptions(user)
         # if user.loggedIn:
         #     getContents(user)
