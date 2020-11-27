@@ -1,11 +1,6 @@
 import sqlite3 as sql
 from User import User
 import re
-def find_hashtag(text):
-    regex = r'#[A-Za-z0-9_]+'
-    r = re.findall(regex, text)
-    r = [i[1:] for i in r]
-    return r
 
 
 # User:
@@ -24,6 +19,13 @@ def find_hashtag(text):
 
 # Hashtags:
 #     tweet_id: id ----> correspoding hashtag
+
+
+def find_hashtag(text):
+    regex = r'#[A-Za-z0-9_]+'
+    r = re.findall(regex, text)
+    r = [i[1:] for i in r]
+    return r
 
 
 class sqliteDB:
@@ -120,8 +122,8 @@ class sqliteDB:
         t = (handle,)
         self.cur.execute(select_command, t)
         return self.cur.fetchall()
-    
-    def get_all_tweets_of_following(self,handle):
+
+    def get_all_tweets_of_following(self, handle):
         select_command = "select * from tweets where author in (select gawd from follows where follower=?)"
         t = (handle,)
         self.cur.execute(select_command, t)
@@ -160,8 +162,8 @@ class sqliteDB:
 
         insert_command = "SELECT COUNT(*) FROM tweets"
         self.cur.execute(insert_command)
-        t_id=self.cur.fetchone()[0]
-        print(tweet_text,"t_id: ",t_id)
+        t_id = self.cur.fetchone()[0]
+        print(tweet_text, "t_id: ", t_id)
 
         insert_command = "INSERT INTO hashtags (tag, t_id) VALUES (?, ?)"
 
