@@ -1,6 +1,7 @@
 from User import User
 from manageDB import sqliteDB
 
+
 class Interaction:
 
     @staticmethod
@@ -8,26 +9,15 @@ class Interaction:
         print("New user: 1. Log In")
         print("Existing user: 2. Sign Up/ Register")
         Interaction.welcome_input()
-    
 
     @staticmethod
     def welcome_input():
         option = int(input("Choose (1) or (2): "))
-        if option==1:
+        if option == 1:
             Interaction.logInScreen()
-        if option==2:
+        if option == 2:
             Interaction.registerScreen()
-    
 
-    @staticmethod
-    def tweet(user:User, s:sqliteDB):
-        print("\nYou chose to tweet!-----")
-        text = input("Enter your text: ")
-        s.add_tweet(user, text)
-        print("Posted your tweet to timeline: %s. . ." % text[:20])
-        Interaction.loggedInOptions(user,s)
-    
-    
     @staticmethod
     def loggedInOptions(user, sqldb):
         print(
@@ -48,13 +38,12 @@ class Interaction:
             option = int(input("Choose from [1-8]: "))
         except:
             print("Invalid choice")
-            Interaction.loggedInOptions(user,sqldb)
-        if not (0<option<9):
+            Interaction.loggedInOptions(user, sqldb)
+        if not (0 < option < 9):
             print("Invalid choice")
-            Interaction.loggedInOptions(user,sqldb)
+            Interaction.loggedInOptions(user, sqldb)
         else:
             Authenticate.loggedInChoice(user, option, sqldb)
-    
 
     @staticmethod
     def logInScreen():
@@ -62,7 +51,6 @@ class Interaction:
         handle = input("Enter your handle: ")
         password = input("Enter your password: ")
         Authenticate.logInUser(handle, password)
-    
 
     @staticmethod
     def registerScreen():
@@ -73,45 +61,61 @@ class Interaction:
         while s.user_exists(handle):
             print("\nThat handle isn't available, try again!")
             handle = input("Enter your handle: ")
-        
+
         password = input("Enter your password: ")
         user = User(name, handle)
         Authenticate.registerUser(user, password)
-    
+
     @staticmethod
-    def get_feed(user,s,top_tweets=10):
-        following_list=s.get_following_list(user)
+    def tweet(user: User, s: sqliteDB):
+        print("\nYou chose to tweet!-----")
+        text = input("Enter your text: ")
+        s.add_tweet(user, text)
+        print("Posted your tweet to timeline: %s. . ." % text[:20])
+        Interaction.loggedInOptions(user, s)
+
+    @staticmethod
+    def get_feed(user, s, top_tweets=10):
+        following_list = s.get_following_list(user)
         print(following_list)
-        tweets=[]
+        tweets = []
         for following in following_list:
             tweets.append(s.get_tweets(following[0]))
+        # TODO print sth
         print(tweets)
-        return
-
+        Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def follow_someone(user,follow_handle,s):
+    def follow_someone(user, follow_handle, s):
         if s.user_exists(follow_handle):
-            if not s.following_exists(user,follow_handle):
-                s.add_follow(user,follow_handle)
+            if not s.following_exists(user, follow_handle):
+                s.add_follow(user, follow_handle)
+                print("\nYou are now following: %s" % follow_handle)
+                Interaction.loggedInOptions(user, s)
             else:
-                return "You already follow him/her"
+                print("\nYou already follow him/her")
+                Interaction.loggedInOptions(user, s)
         else:
-            return "No such user exists"
+            print("\nNo such user exists")
+            Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def unfollow_someone(user,follow_handle,s):
+    def unfollow_someone(user, follow_handle, s):
         if s.user_exists(follow_handle):
-            if s.following_exists(user,follow_handle):
-                s.delete_follow(user,follow_handle)
+            if s.following_exists(user, follow_handle):
+                s.delete_follow(user, follow_handle)
+                # TODO print status
             else:
+                # TODO replace return by print
+                # TODO redirect to loggedin
                 return "You don't follow him/her"
         else:
+            # TODO replace return by print
             return "No such user exists"
 
-    # def get_hashtags(hashtag,s):
-    #     if 
-
+    # TODO - Peeyush
+    # def getTweetsViaHashtag(hashtag,s):
+    #     if
 
 
 class Authenticate:
@@ -123,14 +127,13 @@ class Authenticate:
         try:
             # makeEntry(user, password)
             s.add_user(user, password)
-            Authenticate.redirectToHomeScreen(user,s)
+            Authenticate.redirectToHomeScreen(user, s)
 
         except Exception as e:
             print("\n" + e)
             s.close_connection()
             Interaction.registerScreen()
 
-    
     @staticmethod
     def logInUser(handle, password):
         s = sqliteDB()
@@ -142,24 +145,26 @@ class Authenticate:
         else:
             print("\nSorry wrong credentials, try again!")
             Interaction.logInScreen()
-    
 
     @staticmethod
-    def loggedInChoice(user, option, s:sqliteDB):
-        if option==8:
+    def loggedInChoice(user, option, s: sqliteDB):
+        if option == 8:
             print("\nLOGGED OUT--------")
             s.close_connection()
-            
-        elif option==1:
+
+        elif option == 1:
             Interaction.tweet(user, s)
-        # TODO features [1-7] to be  completed by Peeyush
+
+        elif option == 3:
+            Interaction.get_feed(user, s)
+
+        # TODO rest of features [1-7] to be  completed by Peeyush/Rushil
         # else:
         #     print('not log out')
 
-    
     @staticmethod
     def redirectToHomeScreen(user, sqldb):
         print("\nHi, %s!" % user.handle)
         print("What would you like to do?")
-        
+
         Interaction.loggedInOptions(user, sqldb)
