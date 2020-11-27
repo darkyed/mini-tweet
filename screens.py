@@ -65,6 +65,35 @@ class Interaction:
         password = input("Enter your password: ")
         user = User(name, handle)
         Authenticate.registerUser(user, password)
+    
+    @staticmethod
+    def searchscreen(handle,user,s):
+        print("\nSearch SCREEN---------")
+        print("We found "+ handle)
+
+        number = int(input(
+            """
+            1. Follow handle
+            2. Unfollow handle
+            3. Get handle's tweets
+            """
+        ))
+
+        if number==1:
+            Interaction.follow_someone(user,handle,s)
+        elif number==2:
+            Interaction.follow_someone(user,handle,s)
+        elif number==3:
+            Interaction.print_tweets(s.get_tweets(handle))
+        else:
+            print("invalid option")
+            Interaction.searchscreen(handle,user,s)
+
+    @staticmethod
+    def print_tweets(tweet_list):
+        for tweet in tweet_list:
+            # print(tweet)
+            print("%s tweeted %s" % (tweet[2],tweet[1]))
 
     @staticmethod
     def tweet(user: User, s: sqliteDB):
@@ -72,34 +101,34 @@ class Interaction:
         text = input("Enter your text: ")
         s.add_tweet(user, text)
         print("Posted your tweet to timeline: %s. . ." % text[:20])
-        Interaction.loggedInOptions(user, s)
+        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
     def get_feed(user, s, top_tweets=10):
         tweet_list = s.get_all_tweets_of_following(user.handle)
-        for tweet in tweet_list:
-            # print(tweet)
-            print("%s tweeted %s" % (tweet[2],tweet[1]))
-        Interaction.loggedInOptions(user, s)
+        print_tweets(tweet_list)
+        # for tweet in tweet_list:
+        #     # print(tweet)
+        #     print("%s tweeted %s" % (tweet[2],tweet[1]))
+        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def follow_someone(user, s):
-        follow_handle=input("Who do you want to follow: ")
+    def follow_someone(user,follow_handle, s):
+        
         if s.user_exists(follow_handle):
             if not s.following_exists(user, follow_handle):
                 s.add_follow(user, follow_handle)
                 print("\nYou are now following: %s" % follow_handle)
-                Interaction.loggedInOptions(user, s)
             else:
                 print("\nYou already follow him/her")
-                Interaction.loggedInOptions(user, s)
+                
         else:
             print("\nNo such user exists")
-            Interaction.loggedInOptions(user, s)
+        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def unfollow_someone(user, s):
-        follow_handle=input("Who do you want to unfollow: ")
+    def unfollow_someone(user,follow_handle, s):
+        # follow_handle=input("Who do you want to unfollow: ")
 
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
@@ -107,19 +136,31 @@ class Interaction:
                 print("Deleted follower")
             else:
                 print("You don't follow him/her")
-                Interaction.loggedInOptions(user, s)
         else:
             print("No such user exists")
-            Interaction.loggedInOptions(user, s)
+        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def getTweetsViaHashtag(hashtag, s):
+    def getTweetsViaHashtag(user,s):
+        hashtag=input("Type the hashtag to search for the tweets: ")
         command = '''SELECT tweets.author,tweets.tweet_text 
         FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
         s.cur.execute(command, (hashtag,))
         tweets=s.cur.fetchall()
         for tweet in tweets:
             print("%s tweeted %s"%(tweet[0],tweet[1]))
+        if not len(tweets):
+            print("No tweets exists with hashatg: %s"%(hashtag))
+        # Interaction.loggedInOptions(user, s)
+
+    @staticmethod
+    def search_user(user,s):
+        handle=input("Who do you want to search: ")
+        if s.user_exists(handle):
+            Interaction.searchscreen(handle,user,s)
+        else:
+            print("No such user exists")
+        
         
 
 
@@ -155,6 +196,7 @@ class Authenticate:
         if option == 8:
             print("\nLOGGED OUT--------")
             s.close_connection()
+            return
 
         elif option == 1:
             Interaction.tweet(user, s)
@@ -163,15 +205,20 @@ class Authenticate:
             Interaction.get_feed(user, s)
         
         elif option ==4:
-            Interaction.follow_someone(user,s)
+            follow_handle=input("Who do you want to follow: ")
+            Interaction.follow_someone(user,follow_handle,s)
 
         elif option==5:
-            Interaction.unfollow_someone(user,s)
+            follow_handle=input("Who do you want to unfollow: ")
+            Interaction.unfollow_someone(user,follow_handle,s)
+        
+        elif option==7:
+            Interaction.getTweetsViaHashtag(user,s)
+        
+        elif option==2:
+            Interaction.search_user(user,s)
 
-
-        # TODO Peeyush/Rushil rest of features [1-7]
-        # else:
-        #     print('not log out')
+        Interaction.loggedInOptions(user,s)
 
     @staticmethod
     def redirectToHomeScreen(user, sqldb):
