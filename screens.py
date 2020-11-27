@@ -76,15 +76,17 @@ class Interaction:
 
     @staticmethod
     def get_feed(user, s, top_tweets=10):
-        following_list = s.get_following_list(user)
-        print(following_list)
-        tweets = []
-        for following in following_list:
-            tweets.append(s.get_tweets(following[0]))
-        print("\nFetchin Tweets. . .")
-        # TODO  - Rushil reformat this -> author tweeted: tweet
-        print(tweets)
-        Interaction.loggedInOptions(user, s)
+        # following_list = s.get_following_list(user)
+        # print(following_list)
+        # tweets = []
+        # for following in following_list:
+        #     tweets.append(s.get_tweets(following[0]))
+        # print(tweets)
+        tweet_list=s.get_all_tweets_of_following(user.handle)
+        for tweet in tweet_list:
+            print(tweet)
+            print("%s tweeted %s" % (tweet[2],tweet[1]))
+        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
     def follow_someone(user, follow_handle, s):
@@ -105,18 +107,23 @@ class Interaction:
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
                 s.delete_follow(user, follow_handle)
-                # TODO - Rushil print status
+                print("Deleted follower")
             else:
-                # TODO  - Rushil replace return by print
-                # TODO  - Rushil redirect to loggedin
-                return "You don't follow him/her"
+                print("You don't follow him/her")
+                Interaction.loggedInOptions(user, s)
         else:
-            # TODO  - Rushil replace return by print
-            return "No such user exists"
+            print("No such user exists")
+            Interaction.loggedInOptions(user, s)
 
     # TODO - Peeyush
     # def getTweetsViaHashtag(hashtag,s):
-    #     if
+    @staticmethod
+    def getTweetsViaHashtag(hashtag,s):
+        command = '''SELECT tweets.author,tweets.tweet_text 
+        FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
+        s.cur.execute(command, (hashtag,))
+        tweets=s.cur.fetchall()
+        print(list(set(tweets)))
 
 
 class Authenticate:

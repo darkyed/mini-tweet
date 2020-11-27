@@ -7,9 +7,10 @@ s.create_table()
 
 s.create_table("tweets")
 s.create_table("follows")
+s.create_table("hashtags")
 
-tweets = ["assadfa", "dgsdgsdg", "dagsdgsdg"]
-authors_handles = ["fds", "das", "hre"]
+tweets = ["assadfa ", "peeyush #lodu", "dagsdgsdg"]
+authors_handles = ["peeyu", "saumitra", "rushil"]
 author_names = ['A', 'B', 'C']
 passwords = ['123']*3
 
@@ -24,13 +25,16 @@ for u,t in zip(users,tweets):
     s.add_tweet(u,t)
 
 s.add_follow(users[0],users[1])
-print(s.get_following_list(users[0]),users[1].handle)
-print("tweets: ",Interaction.get_feed(users[0],s))
+print("Following List: ",s.get_following_list(users[0]),users[1].handle)
+print("tweets: ")
+Interaction.get_feed(users[0],s)
+Interaction.getTweetsViaHashtag("lodu",s)
 s.delete_follow(users[0],users[1])
 print(s.get_following_list(users[0]),users[1].handle)
-command = "select * from tweets"
-s.cur.execute(command)
+Interaction.get_feed(users[0],s)
+# command = "select * from tweets"
+# s.cur.execute(command)
 
-res = s.cur.fetchall()
-for r in res:
-    print(r)
+# res = s.cur.fetchall()
+# for r in res:
+#     print(r)

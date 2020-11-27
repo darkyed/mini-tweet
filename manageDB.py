@@ -1,5 +1,11 @@
 import sqlite3 as sql
 from User import User
+import re
+def find_hashtag(text):
+    regex = r'#[A-Za-z0-9_]+'
+    r = re.findall(regex, text)
+    r = [i[1:] for i in r]
+    return r
 
 
 # User:
@@ -114,6 +120,12 @@ class sqliteDB:
         t = (handle,)
         self.cur.execute(select_command, t)
         return self.cur.fetchall()
+    
+    def get_all_tweets_of_following(self,handle):
+        select_command = "select * from tweets where author in (select gawd from follows where follower=?)"
+        t = (handle,)
+        self.cur.execute(select_command, t)
+        return self.cur.fetchall()
 
     def delete_follow(self, user: User, following: User):
         self.cur.execute("DELETE FROM follows where gawd=? and follower=?",
@@ -143,8 +155,19 @@ class sqliteDB:
 
         insert_command = "INSERT INTO tweets (tweet_text, author) VALUES (?, ?)"
 
-        self.cur.execute(insert_command, (tweet_text, user.handle))
+        self.cur.execute(insert_command, (tweet_text, user.handle,))
         self.commit_changes()
+
+        insert_command = "SELECT COUNT(*) FROM tweets"
+        self.cur.execute(insert_command)
+        t_id=self.cur.fetchone()[0]
+        print(tweet_text,"t_id: ",t_id)
+
+        insert_command = "INSERT INTO hashtags (tag, t_id) VALUES (?, ?)"
+
+        for hashtag in find_hashtag(tweet_text):
+            self.cur.execute(insert_command, (hashtag, t_id))
+            self.commit_changes()
 
     def commit_changes(self):
         self.conn.commit()
