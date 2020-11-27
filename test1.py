@@ -25,12 +25,14 @@ for u,t in zip(users,tweets):
     s.add_tweet(u,t)
 
 s.add_follow(users[0],users[1])
-print("Following List: ",s.get_following_list(users[0]),users[1].handle)
-print("tweets: ")
+print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
+print("feed of %s: "%(users[0].handle))
 Interaction.get_feed(users[0],s)
+print("tweets with hashtag #%s"%("lodu"))
 Interaction.getTweetsViaHashtag("lodu",s)
 s.delete_follow(users[0],users[1])
-print(s.get_following_list(users[0]),users[1].handle)
+print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
+print("feed of %s: "%(users[0].handle))
 Interaction.get_feed(users[0],s)
 # command = "select * from tweets"
 # s.cur.execute(command)

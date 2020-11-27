@@ -133,12 +133,14 @@ class sqliteDB:
         self.cur.execute("DELETE FROM follows where gawd=? and follower=?",
                          (following.handle, user.handle,))
         self.commit_changes()
+        print("Now %s doesn't follow %s"%(user.handle,following.handle))
 
     def add_follow(self, user: User, following: User):
         if not self.following_exists(user, following):
             self.cur.execute("INSERT into follows VALUES (?, ?)",
                              (user.handle, following.handle,))
             self.commit_changes()
+            print("Now %s follows %s"%(user.handle,following.handle))
         else:
             print("Already following")
 
@@ -160,10 +162,11 @@ class sqliteDB:
         self.cur.execute(insert_command, (tweet_text, user.handle,))
         self.commit_changes()
 
+        print("New tweet: %s tweeted %s"%(user.handle,tweet_text))
         insert_command = "SELECT COUNT(*) FROM tweets"
         self.cur.execute(insert_command)
-        t_id = self.cur.fetchone()[0]
-        print(tweet_text, "t_id: ", t_id)
+        t_id=self.cur.fetchone()[0]
+        # print(tweet_text,"t_id: ",t_id)
 
         insert_command = "INSERT INTO hashtags (tag, t_id) VALUES (?, ?)"
 

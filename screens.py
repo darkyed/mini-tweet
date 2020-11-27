@@ -78,8 +78,8 @@ class Interaction:
     def get_feed(user, s, top_tweets=10):
         tweet_list = s.get_all_tweets_of_following(user.handle)
         for tweet in tweet_list:
-            print(tweet)
-            print("%s tweeted %s" % (tweet[2], tweet[1]))
+            # print(tweet)
+            print("%s tweeted %s" % (tweet[2],tweet[1]))
         Interaction.loggedInOptions(user, s)
 
     @staticmethod
@@ -114,8 +114,10 @@ class Interaction:
         command = '''SELECT tweets.author,tweets.tweet_text 
         FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
         s.cur.execute(command, (hashtag,))
-        tweets = s.cur.fetchall()
-        print(list(set(tweets)))
+        tweets=s.cur.fetchall()
+        for tweet in tweets:
+            print("%s tweeted %s"%(tweet[0],tweet[1]))
+
 
 
 class Authenticate:
