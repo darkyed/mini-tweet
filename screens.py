@@ -81,7 +81,8 @@ class Interaction:
         tweets = []
         for following in following_list:
             tweets.append(s.get_tweets(following[0]))
-        # TODO print sth
+        print("\nFetchin Tweets. . .")
+        # TODO  - Rushil reformat this -> author tweeted: tweet
         print(tweets)
         Interaction.loggedInOptions(user, s)
 
@@ -104,13 +105,13 @@ class Interaction:
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
                 s.delete_follow(user, follow_handle)
-                # TODO print status
+                # TODO - Rushil print status
             else:
-                # TODO replace return by print
-                # TODO redirect to loggedin
+                # TODO  - Rushil replace return by print
+                # TODO  - Rushil redirect to loggedin
                 return "You don't follow him/her"
         else:
-            # TODO replace return by print
+            # TODO  - Rushil replace return by print
             return "No such user exists"
 
     # TODO - Peeyush
@@ -158,7 +159,7 @@ class Authenticate:
         elif option == 3:
             Interaction.get_feed(user, s)
 
-        # TODO rest of features [1-7] to be  completed by Peeyush/Rushil
+        # TODO Peeyush/Rushil rest of features [1-7]
         # else:
         #     print('not log out')
 
