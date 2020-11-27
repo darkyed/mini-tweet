@@ -74,6 +74,7 @@ class Interaction:
         print("Posted your tweet to timeline: %s. . ." % text[:20])
         Interaction.loggedInOptions(user, s)
 
+
     @staticmethod
     def get_feed(user, s, top_tweets=10):
         following_list = s.get_following_list(user)
