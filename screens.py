@@ -84,7 +84,7 @@ class Interaction:
         # print(tweets)
         tweet_list=s.get_all_tweets_of_following(user.handle)
         for tweet in tweet_list:
-            print(tweet)
+            # print(tweet)
             print("%s tweeted %s" % (tweet[2],tweet[1]))
         # Interaction.loggedInOptions(user, s)
 
@@ -115,15 +115,15 @@ class Interaction:
             print("No such user exists")
             Interaction.loggedInOptions(user, s)
 
-    # TODO - Peeyush
-    # def getTweetsViaHashtag(hashtag,s):
     @staticmethod
     def getTweetsViaHashtag(hashtag,s):
         command = '''SELECT tweets.author,tweets.tweet_text 
         FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
         s.cur.execute(command, (hashtag,))
         tweets=s.cur.fetchall()
-        print(list(set(tweets)))
+        for tweet in tweets:
+            print("%s tweeted %s"%(tweet[0],tweet[1]))
+
 
 
 class Authenticate:
