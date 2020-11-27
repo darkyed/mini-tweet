@@ -89,7 +89,8 @@ class Interaction:
         # Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def follow_someone(user, follow_handle, s):
+    def follow_someone(user, s):
+        follow_handle=input("Who do you want to follow: ")
         if s.user_exists(follow_handle):
             if not s.following_exists(user, follow_handle):
                 s.add_follow(user, follow_handle)
@@ -103,7 +104,9 @@ class Interaction:
             Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def unfollow_someone(user, follow_handle, s):
+    def unfollow_someone(user, s):
+        follow_handle=input("Who do you want to unfollow: ")
+
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
                 s.delete_follow(user, follow_handle)
@@ -123,7 +126,7 @@ class Interaction:
         tweets=s.cur.fetchall()
         for tweet in tweets:
             print("%s tweeted %s"%(tweet[0],tweet[1]))
-
+        
 
 
 class Authenticate:
@@ -165,6 +168,13 @@ class Authenticate:
 
         elif option == 3:
             Interaction.get_feed(user, s)
+        
+        elif option ==4:
+            Interaction.follow_someone(user,s)
+
+        elif option==5:
+            Interaction.unfollow_someone(user,s)
+
 
         # TODO Peeyush/Rushil rest of features [1-7]
         # else:
