@@ -129,24 +129,24 @@ class sqliteDB:
         self.cur.execute(select_command, t)
         return self.cur.fetchall()
 
-    def delete_follow(self, user: User, following: User):
+    def delete_follow(self, user: User, following: str):
         self.cur.execute("DELETE FROM follows where gawd=? and follower=?",
-                         (following.handle, user.handle,))
+                         (following, user.handle,))
         self.commit_changes()
-        print("Now %s doesn't follow %s"%(user.handle,following.handle))
+        print("Now %s doesn't follow %s" % (user.handle, following))
 
-    def add_follow(self, user: User, following: User):
+    def add_follow(self, user: User, following: str):
         if not self.following_exists(user, following):
             self.cur.execute("INSERT into follows VALUES (?, ?)",
-                             (user.handle, following.handle,))
+                             (user.handle, following,))
             self.commit_changes()
-            print("Now %s follows %s"%(user.handle,following.handle))
+            print("Now %s follows %s" % (user.handle, following))
         else:
             print("Already following")
 
-    def following_exists(self, user: User, following: User):
+    def following_exists(self, user: User, following: str):
         handle = user.handle
-        following_handle = following.handle
+        following_handle = following
         select_command = "SELECT * FROM follows WHERE gawd=? and follower=?"
         t = (following_handle, handle,)
         self.cur.execute(select_command, t)
@@ -162,10 +162,10 @@ class sqliteDB:
         self.cur.execute(insert_command, (tweet_text, user.handle,))
         self.commit_changes()
 
-        print("New tweet: %s tweeted %s"%(user.handle,tweet_text))
+        print("New tweet: %s tweeted '%s'" % (user.handle, tweet_text))
         insert_command = "SELECT COUNT(*) FROM tweets"
         self.cur.execute(insert_command)
-        t_id=self.cur.fetchone()[0]
+        t_id = self.cur.fetchone()[0]
         # print(tweet_text,"t_id: ",t_id)
 
         insert_command = "INSERT INTO hashtags (tag, t_id) VALUES (?, ?)"
