@@ -76,17 +76,11 @@ class Interaction:
 
     @staticmethod
     def get_feed(user, s, top_tweets=10):
-        # following_list = s.get_following_list(user)
-        # print(following_list)
-        # tweets = []
-        # for following in following_list:
-        #     tweets.append(s.get_tweets(following[0]))
-        # print(tweets)
-        tweet_list=s.get_all_tweets_of_following(user.handle)
+        tweet_list = s.get_all_tweets_of_following(user.handle)
         for tweet in tweet_list:
             # print(tweet)
             print("%s tweeted %s" % (tweet[2],tweet[1]))
-        # Interaction.loggedInOptions(user, s)
+        Interaction.loggedInOptions(user, s)
 
     @staticmethod
     def follow_someone(user, s):
@@ -119,7 +113,7 @@ class Interaction:
             Interaction.loggedInOptions(user, s)
 
     @staticmethod
-    def getTweetsViaHashtag(hashtag,s):
+    def getTweetsViaHashtag(hashtag, s):
         command = '''SELECT tweets.author,tweets.tweet_text 
         FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
         s.cur.execute(command, (hashtag,))
@@ -136,7 +130,6 @@ class Authenticate:
         s = sqliteDB()
         print("Added user:", user)
         try:
-            # makeEntry(user, password)
             s.add_user(user, password)
             Authenticate.redirectToHomeScreen(user, s)
 
