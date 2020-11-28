@@ -32,7 +32,9 @@ class ThreadServer(object):
 
     def sendData(self, conn_sock, data: str):
         try:
-            conn_sock.send(data.encode('utf-8'))
+            data = data.encode("UTF-8")
+            conn_sock.send(len(data).to_bytes(7, 'big'))
+            conn_sock.send(data)
         except socket.error as e:
             print("Error sending data: %s" % e)
             sys.exit(1)
@@ -41,6 +43,8 @@ class ThreadServer(object):
 
         # while True:
         try:
+            data_size = conn_sock.recv(7)
+            data_size = int.from_bytes(data_size, 'big')
             data = conn_sock.recv(size)
         except socket.error as e:
             print("Error receiving data: %s" % e)

@@ -1,6 +1,7 @@
 
 import sys,os
 sys.path.append(os.getcwd())
+# sys.path.append('../')
 from UtilFuncs.manageDB import sqliteDB
 import os
 import time
@@ -42,7 +43,9 @@ class TCPClient:
 
     def sendData(self, data: str):
         try:
-            self.client_socket.send(data.encode('utf-8'))
+            data = data.encode("UTF-8")
+            self.client_socket.send(len(data).to_bytes(7, 'big'))
+            self.client_socket.send(data)
         except error as e:
             print("Error sending data: %s" % e)
             sys.exit(1)
@@ -52,7 +55,9 @@ class TCPClient:
         Receive data of size 'size' from the server using socket 'sock'
         """
         try:
-            data = self.client_socket.recv(size)
+            data_size = self.client_socket.recv(7)
+            data_size = int.from_bytes(data_size, 'big')
+            data = self.client_socket.recv(data_size)
         except error as e:
             print("Error receiving data: %s" % e)
             sys.exit(1)
