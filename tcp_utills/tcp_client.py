@@ -1,16 +1,16 @@
-from manageDB import sqliteDB
+from UtilFuncs.manageDB import sqliteDB
 import os
 import time
 import json
 import logging
 import threading
-from User import User
+from UtilFuncs.User import User
 from socket import *
-from screens import Interaction as interact, Authenticate as auth
+from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 
 
 class TCPClient:
-    def __init__(self, protocol="TCP", server_address="10.0.0.1", port=12345) -> None:
+    def __init__(self, protocol="TCP", server_address="127.0.0.1", port=12345) -> None:
         self.protocol = protocol
         self.server_address = server_address
         self.port = port
@@ -27,9 +27,10 @@ class TCPClient:
 
         logging.debug("connected!")
 
-    # TODO
+
     def welcome_screen(self):
-        option = interact.welcome()
+        interact.welcome()
+        option = interact.welcome_input()
         if option == 1:
             self.login_user()
         if option == 2:
@@ -54,20 +55,27 @@ class TCPClient:
 
         return data.decode('utf-8')
 
-    # TODO complete this
+    
     def register_user(self):
-        handle = interact.registerScreen()
+        handle = interact.getInputHandle()
         self.sendData(handle)
         message = self.recvData()
         if message == 'n': 
+            time.sleep(1)
             print("User handle already exists! Please try with a new handle")
             self.register_user()
         else: 
-            #TODO - send name and password and need to interact
-            print("You are registered!")
-            option = auth.redirectToHomeScreen(handle)
-            option = str(option)
-            self.main_page(option)
+            name, password = interact.registerScreen()
+            self.sendData(name + "ψ" + password)
+
+            ack = self.recvData()
+            if ack=='y':
+                print("You are registered!")
+                option = auth.redirectToHomeScreen(handle)
+                option = str(option)
+                self.main_page(option)
+            
+            # FIXME else
 
 
     def login_user(self):

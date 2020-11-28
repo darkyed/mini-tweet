@@ -1,5 +1,5 @@
 import sqlite3 as sql
-from User import User
+from UtilFuncs.User import User
 import re
 
 

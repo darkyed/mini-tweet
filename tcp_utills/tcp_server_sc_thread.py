@@ -1,10 +1,11 @@
 import os
 import sys
+# sys.path.append('../')
 import socket
 import logging
 from threading import Thread, active_count
-from manageDB import *
-from screens import Interaction as interact, Authenticate as auth
+from UtilFuncs.manageDB import *
+from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 
 
 # from utilfuncs import *
@@ -71,11 +72,12 @@ class ThreadServer(object):
             self.sendData('n')
             self.login_client(conn_sock)
 
-    # TODO
+
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
-        if self.sqldb.user_exists(handle) == False:
-            name, password = self.recvData(conn_sock)
+        if not self.sqldb.user_exists(handle):
+            self.sendData(conn_sock, 'y')
+            name, password = self.recvData(conn_sock).split('ψ')
             user = User(name, handle)
             self.sqldb.add_user(user, password)
             self.sendData('y')

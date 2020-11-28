@@ -1,5 +1,5 @@
-from User import User
-from manageDB import sqliteDB
+from UtilFuncs.User import User
+from UtilFuncs.manageDB import sqliteDB
 
 
 class Interaction:
@@ -57,21 +57,26 @@ class Interaction:
 
     #TODO - Create method for handle
     @staticmethod
-    def registerScreen():
+    def getInputHandle():
         print("\nREGISTRATION SCREEN---------")
-        name = input("Enter just your first name: ")
         handle = input("Enter your handle: ")
+        return handle
+
+
+    @staticmethod
+    def registerScreen():
+        name = input("Enter just your first name: ")
         password = input("Enter your password: ")
-        return name, handle, password
+        return name, password
         #Server
         # s = sqliteDB()
         # while s.user_exists(handle):
         #     print("\nThat handle isn't available, try again!")
         #     handle = input("Enter your handle: ")
 
-
-        user = User(name, handle)
-        Authenticate.registerUser(user, password)
+        # server
+        # user = User(name, handle)
+        # Authenticate.registerUser(user, password)
 
     @staticmethod
     def searchscreen(handle):
