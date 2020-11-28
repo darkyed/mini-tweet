@@ -1,6 +1,6 @@
 import os
 import sys
-# sys.path.append('../')
+sys.path.append(os.getcwd())
 import socket
 import logging
 from threading import Thread, active_count
@@ -37,11 +37,16 @@ class ThreadServer(object):
             sys.exit(1)
 
     def recvData(self, conn_sock, size=default_buffer):
+
+        # while True:
         try:
             data = conn_sock.recv(size)
         except socket.error as e:
             print("Error receiving data: %s" % e)
             sys.exit(1)
+                # break
+            # if data:
+            #     break
 
         return data.decode('utf-8')
 
@@ -75,14 +80,18 @@ class ThreadServer(object):
 
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
+        print("Received registration: ",handle)
         if not self.sqldb.user_exists(handle):
             self.sendData(conn_sock, 'y')
             name, password = self.recvData(conn_sock).split('ψ')
+            print(name,password)
             user = User(name, handle)
             self.sqldb.add_user(user, password)
             self.sendData('y')
+            print("Added user")
         else:
             #User already exists
+            print("Already exists")
             self.sendData('n')
             self.register_client(conn_sock)
             
@@ -177,8 +186,10 @@ class ThreadServer(object):
                 # 1 or 2
                 data = self.recvData(connection_socket)
                 if data == '1':
+                    logging.debug("going to login")
                     self.login_client(connection_socket)
                 elif data == '2':
+                    logging.debug("going to register")
                     self.register_client(connection_socket)
 
                 # TODO where to do threading?

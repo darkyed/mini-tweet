@@ -1,3 +1,6 @@
+
+import sys,os
+sys.path.append(os.getcwd())
 from UtilFuncs.manageDB import sqliteDB
 import os
 import time
@@ -31,6 +34,7 @@ class TCPClient:
     def welcome_screen(self):
         interact.welcome()
         option = interact.welcome_input()
+        self.sendData(str(option))
         if option == 1:
             self.login_user()
         if option == 2:
@@ -58,6 +62,7 @@ class TCPClient:
     
     def register_user(self):
         handle = interact.getInputHandle()
+        # print(handle)
         self.sendData(handle)
         message = self.recvData()
         if message == 'n': 
@@ -67,7 +72,7 @@ class TCPClient:
         else: 
             name, password = interact.registerScreen()
             self.sendData(name + "ψ" + password)
-
+            print("Sent")
             ack = self.recvData()
             if ack=='y':
                 print("You are registered!")
