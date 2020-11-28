@@ -1,16 +1,17 @@
 
-import sys,os
+from UtilFuncs.screens import Interaction as interact, Authenticate as auth
+from socket import *
+from UtilFuncs.User import User
+import threading
+import logging
+import json
+import time
+import os
+from UtilFuncs.manageDB import sqliteDB
+import sys
+import os
 sys.path.append(os.getcwd())
 # sys.path.append('../')
-from UtilFuncs.manageDB import sqliteDB
-import os
-import time
-import json
-import logging
-import threading
-from UtilFuncs.User import User
-from socket import *
-from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 
 
 class TCPClient:
@@ -31,10 +32,8 @@ class TCPClient:
 
         logging.debug("connected!")
 
-
     def welcome_screen(self):
-        interact.welcome()
-        option = interact.welcome_input()
+        option = interact.welcome()
         self.sendData(str(option))
         if option == 1:
             self.login_user()
@@ -64,33 +63,31 @@ class TCPClient:
 
         return data.decode('utf-8')
 
-    
     def register_user(self):
         handle = interact.getInputHandle()
         # print(handle)
         self.sendData(handle)
         message = self.recvData()
-        if message == 'n': 
+        if message == 'n':
             time.sleep(1)
             print("User handle already exists! Please try with a new handle")
             self.register_user()
-        else: 
+        else:
             name, password = interact.registerScreen()
             self.user = User(name, handle)
             self.sendData(name + "\r" + password)
             print("Sent")
 
             ack = self.recvData()
-            
-            if ack=='y':
+
+            if ack == 'y':
                 print("You are registered!")
                 option = auth.redirectToHomeScreen(handle)
                 option = str(option)
                 print("you chose:", option)
                 self.main_page(option)
-            
-            # FIXME else
 
+            # FIXME else
 
     def login_user(self):
         # username
@@ -114,7 +111,7 @@ class TCPClient:
             time.sleep(1)
             self.login_user()
 
-    def main_page(self, option:str):
+    def main_page(self, option: str):
         # 1
         print(option)
         self.sendData(option)
@@ -144,11 +141,10 @@ class TCPClient:
 
                     r = self.recvData()
 
-
                     # 1 -> follow
                     # 2 -> unfollow
                     # 3 -> tweets
-                    while r and (r!="\r"):
+                    while r and (r != "\r"):
                         print(r)
                         r = self.recvData()
 
@@ -160,7 +156,7 @@ class TCPClient:
         elif option == '3':
             # get updates
             r = self.recvData()
-            while r and (r!="\r"):
+            while r and (r != "\r"):
                 print(r)
                 r = self.recvData()
 
@@ -189,7 +185,7 @@ class TCPClient:
             hashtag = input("Enter hashtag: #")
             self.sendData(hashtag)
             r = self.recvData()
-            while r and (r!="\r"):
+            while r and (r != "\r"):
                 print(r)
                 r = self.recvData()
 

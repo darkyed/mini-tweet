@@ -8,16 +8,12 @@ class Interaction:
     def welcome():
         print("New user: 1. Log In")
         print("Existing user: 2. Sign Up/ Register")
-        # Interaction.welcome_input()
+        return Interaction.welcome_input()
 
     @staticmethod
     def welcome_input():
         option = int(input("Choose (1) or (2): "))
         return option
-        # if option == 1:
-        #     Interaction.logInScreen()
-        # if option == 2:
-        #     Interaction.registerScreen()
 
     @staticmethod
     def loggedInOptions(handle):
@@ -53,30 +49,19 @@ class Interaction:
         handle = input("Enter your handle: ")
         password = input("Enter your password: ")
         return handle, password
-        # Authenticate.logInUser(handle, password)
 
-    #TODO - Create method for handle
+    # TODO - Create method for handle
     @staticmethod
     def getInputHandle():
         print("\nREGISTRATION SCREEN---------")
         handle = input("Enter your handle: ")
         return handle
 
-
     @staticmethod
     def registerScreen():
         name = input("Enter just your first name: ")
         password = input("Enter your password: ")
         return name, password
-        #Server
-        # s = sqliteDB()
-        # while s.user_exists(handle):
-        #     print("\nThat handle isn't available, try again!")
-        #     handle = input("Enter your handle: ")
-
-        # server
-        # user = User(name, handle)
-        # Authenticate.registerUser(user, password)
 
     @staticmethod
     def searchscreen(handle):
@@ -91,29 +76,15 @@ class Interaction:
             """
         )
         number = int(input("Choose from [1-3]: "))
-        if not (0<number<4):
+        if not (0 < number < 4):
             print("invalid option, try again!")
             Interaction.searchscreen(handle)
         else:
             return str(number)
-        # # server
-        # if number == 1:
-        #     Interaction.follow_someone(user, handle, s)
-        # elif number == 2:
-        #     Interaction.unfollow_someone(user, handle, s)
-        # elif number == 3:
-        #     Interaction.print_tweets(s.get_tweets(handle))
-        # else:
-        #     print("invalid option")
-
-        # Recurse
-        # Interaction.searchscreen(handle, user, s)
-        # s.close_connection()
 
     @staticmethod
     def print_tweets(tweet_list):
         for tweet in tweet_list:
-            # print(tweet)
             print("%s tweeted %s" % (tweet[2], tweet[1]))
 
     @staticmethod
@@ -122,24 +93,11 @@ class Interaction:
         text = input("Enter your text: ")
         return text
 
-        # server part
-        # s.add_tweet(user, text)
-
-        # client
-        # print("Posted your tweet to timeline: %s. . ." % text[:20])
-
-    # server
     @staticmethod
-    def get_feed(user, s:sqliteDB, top_tweets=10):
+    def get_feed(user, s: sqliteDB, top_tweets=10):
         tweet_list = s.get_all_tweets_of_following(user.handle)
         return tweet_list
-        # Interaction.print_tweets(tweet_list)
-        # for tweet in tweet_list:
-        #     # print(tweet)
-        #     print("%s tweeted %s" % (tweet[2],tweet[1]))
-        # Interaction.loggedInOptions(user, s)
 
-    # server
     @staticmethod
     def follow_someone(user, follow_handle, s):
 
@@ -152,7 +110,6 @@ class Interaction:
 
         else:
             return "\nNo such user exists"
-        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
     def unfollow_someone(user, follow_handle, s: sqliteDB):
@@ -166,9 +123,7 @@ class Interaction:
                 return "You don't follow him/her"
         else:
             return "No such user exists"
-        # Interaction.loggedInOptions(user, s)
 
-    # server
     @staticmethod
     def getTweetsViaHashtag(user, hashtag, s: sqliteDB):
         command = '''SELECT tweets.tweet_id, tweets.tweet_text, tweets.author 
@@ -176,52 +131,23 @@ class Interaction:
         s.cur.execute(command, (hashtag,))
         tweets = s.cur.fetchall()
         return tweets
-        # for tweet in tweets:
-        #     print("%s tweeted %s" % (tweet[0], tweet[1]))
-        # if not tweets:
-        #     return "No tweets exists with hashatg: %s" % (hashtag)
-        # else:
-        #     return tweets
-        # Interaction.loggedInOptions(user, s)
 
     @staticmethod
     def search_user():
         handle = input("Who do you want to search: ")
         return handle
-        # server
-        # if s.user_exists(handle):
-        #     Interaction.searchscreen(handle, user, s)
-        # else:
-        #     print("No such user exists")
 
 
 class Authenticate:
 
     @staticmethod
-    def registerUser(user, password):
-        s = sqliteDB()
-        print("Added user:", user)
-        try:
-            s.add_user(user, password)
-            Authenticate.redirectToHomeScreen(user, s)
-
-        except Exception as e:
-            print("\n" + e)
-            s.close_connection()
-            Interaction.registerScreen()
-
-    @staticmethod
-    def logInUser(s: sqliteDB, handle, password):
+    def logInUser(s: sqliteDB, handle: str, password: str):
         if s.verify_login(handle, password):
-            # print("---Logged In---") -- client
             user = s.getUserViaHandle(handle)
             user = User(*user)
             return user
-            # Authenticate.redirectToHomeScreen(user, s)
         else:
             return False
-            # print("\nSorry wrong credentials, try again!")
-            # Interaction.logInScreen()
 
     @staticmethod
     def loggedInChoice(user, option, s: sqliteDB):

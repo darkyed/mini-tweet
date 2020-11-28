@@ -1,12 +1,12 @@
+from UtilFuncs.screens import Interaction as interact, Authenticate as auth
+from UtilFuncs.manageDB import *
+from threading import Thread, active_count
+import logging
+import socket
 from enum import unique
 import os
 import sys
 sys.path.append(os.getcwd())
-import socket
-import logging
-from threading import Thread, active_count
-from UtilFuncs.manageDB import *
-from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 
 
 # from utilfuncs import *
@@ -49,7 +49,7 @@ class ThreadServer(object):
         except socket.error as e:
             logging.warning("Error receiving data: %s" % e)
             sys.exit(1)
-                # break
+            # break
             # if data:
             #     break
 
@@ -82,24 +82,23 @@ class ThreadServer(object):
             self.sendData(conn_sock, 'n')
             self.login_client(conn_sock)
 
-
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
-        logging.debug("Received registration: ",handle)
-        unique_user = self.sqldb.user_exists(handle)
+        logging.debug("Received registration: ", handle)
+        user_in_db = self.sqldb.user_exists(handle)
 
-        if not unique_user:
+        if not user_in_db:
             logging.debug("unique user found")
             self.sendData(conn_sock, 'y')
 
             namepass = self.recvData(conn_sock)
             logging.debug("got name and password")
-            
+
             name, password = namepass.split('\r')
             user = User(name, handle)
 
             self.sqldb.add_user(user, password)
-            
+
             self.sendData(conn_sock, 'y')
 
             logging.debug("Registered new user: %s" % user.handle)
@@ -108,33 +107,31 @@ class ThreadServer(object):
             self.main_page(conn_sock, user, register_option)
 
         else:
-            #User already exists
+            # User already exists
             logging.debug("Already exists")
             self.sendData(conn_sock, 'n')
             logging.debug("set ack: n")
             self.register_client(conn_sock)
-            
-
 
     def send_tweets(self, conn_sock, user, tweets):
         for tweet in tweets:
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
 
-
-    def main_page(self, conn_sock, user:User, option):
+    def main_page(self, conn_sock, user: User, option):
 
         if option == '1':
-            
+
             self.sendData(conn_sock, 'y')
             logging.debug('sent ack')
-            
+
             text = self.recvData(conn_sock)
             logging.debug("received tweet")
-            
+
             self.sqldb.add_tweet(user, text)
 
-            logging.debug("New Tweet by %s: %s. . ."%(user.handle,text[:20]))
+            logging.debug("New Tweet by %s: %s. . ." %
+                          (user.handle, text[:20]))
             # TODO to send ack
 
         elif option == '2':
@@ -159,7 +156,7 @@ class ThreadServer(object):
                 elif option_search == '3':
                     tweets = self.sqldb.get_tweets(handle)
                     self.send_tweets(conn_sock, user, tweets)
-                
+
                 self.sendData(conn_sock, "\r")
 
             else:
@@ -169,7 +166,7 @@ class ThreadServer(object):
             # get updates
             tweets = interact.get_feed(user, self.sqldb)
             logging.debug("fetched tweets")
-            
+
             self.send_tweets(conn_sock, user, tweets)
             self.sendData(conn_sock, "\r")
 
@@ -179,7 +176,7 @@ class ThreadServer(object):
                 res = interact.follow_someone(user, handle, self.sqldb)
             else:
                 res = interact.unfollow_someone(user, handle, self.sqldb)
-            
+
             if 'No' in res:
                 self.sendData(conn_sock, 'n')
             else:
