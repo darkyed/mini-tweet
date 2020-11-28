@@ -37,15 +37,15 @@ class Interaction:
         option = 0
         try:
             option = int(input("Choose from [1-8]: "))
-            return option
         except:
             print("Invalid choice")
-            Interaction.loggedInOptions(handle)
+            return Interaction.loggedInOptions(handle)
         if not (0 < option < 9):
             print("Invalid choice")
-            Interaction.loggedInOptions(handle)
+            return Interaction.loggedInOptions(handle)
         else:
-            Authenticate.loggedInChoice(handle, option)
+            return str(option)
+            # Authenticate.loggedInChoice(handle, option)
 
     @staticmethod
     def logInScreen():
@@ -91,7 +91,11 @@ class Interaction:
             """
         )
         number = int(input("Choose from [1-3]: "))
-        return number
+        if not (0<number<4):
+            print("invalid option, try again!")
+            Interaction.searchscreen(handle)
+        else:
+            return str(number)
         # # server
         # if number == 1:
         #     Interaction.follow_someone(user, handle, s)
@@ -113,7 +117,7 @@ class Interaction:
             print("%s tweeted %s" % (tweet[2], tweet[1]))
 
     @staticmethod
-    def tweet(user: User, s: sqliteDB):
+    def tweet():
         print("\nYou chose to tweet!-----")
         text = input("Enter your text: ")
         return text
@@ -126,7 +130,7 @@ class Interaction:
 
     # server
     @staticmethod
-    def get_feed(user, s, top_tweets=10):
+    def get_feed(user, s:sqliteDB, top_tweets=10):
         tweet_list = s.get_all_tweets_of_following(user.handle)
         return tweet_list
         # Interaction.print_tweets(tweet_list)
@@ -167,7 +171,7 @@ class Interaction:
     # server
     @staticmethod
     def getTweetsViaHashtag(user, hashtag, s: sqliteDB):
-        command = '''SELECT tweets.author,tweets.tweet_text 
+        command = '''SELECT tweets.tweet_id, tweets.tweet_text, tweets.author 
         FROM tweets INNER JOIN hashtags ON tweets.tweet_id=hashtags.t_id AND hashtags.tag=?'''
         s.cur.execute(command, (hashtag,))
         tweets = s.cur.fetchall()
@@ -252,4 +256,4 @@ class Authenticate:
         print("\nHi, %s!" % handle)
         print("What would you like to do?")
 
-        Interaction.loggedInOptions(handle)
+        return Interaction.loggedInOptions(handle)

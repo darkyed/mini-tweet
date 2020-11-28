@@ -71,13 +71,17 @@ class TCPClient:
             self.register_user()
         else: 
             name, password = interact.registerScreen()
-            self.sendData(name + "ψ" + password)
+            self.user = User(name, handle)
+            self.sendData(name + "\r" + password)
             print("Sent")
+
             ack = self.recvData()
+            
             if ack=='y':
                 print("You are registered!")
                 option = auth.redirectToHomeScreen(handle)
                 option = str(option)
+                print("you chose:", option)
                 self.main_page(option)
             
             # FIXME else
@@ -87,7 +91,7 @@ class TCPClient:
         # username
         handle, password = interact.logInScreen()
 
-        self.sendData(handle + "ψ" + password)
+        self.sendData(handle + "\r" + password)
         # y n
         received_data = self.recvData(1)
 
@@ -105,8 +109,9 @@ class TCPClient:
             time.sleep(1)
             self.login_user()
 
-    def main_page(self, option):
+    def main_page(self, option:str):
         # 1
+        print(option)
         self.sendData(option)
 
         if option == '1':
@@ -114,15 +119,16 @@ class TCPClient:
             if received_data == 'y':
                 text = interact.tweet()
                 self.sendData(text)
+
                 # TODO acked by server
                 time.sleep(1)
                 print("Post was added. . .")
 
         elif option == '2':
             received_data = self.recvData()
+
             if received_data == 'y':
                 handle = interact.search_user()
-
                 self.sendData(handle)
                 exist = self.recvData()
 
@@ -133,24 +139,23 @@ class TCPClient:
 
                     r = self.recvData()
 
-                    input("Enter handle:")
+
                     # 1 -> follow
                     # 2 -> unfollow
                     # 3 -> tweets
-                    while r:
+                    while r and (r!="\r"):
                         print(r)
                         r = self.recvData()
 
                 else:
                     print("User not found!")
                     # Recurse
-                    option = interact.searchscreen(handle)
                     self.main_page(option)
 
         elif option == '3':
             # get updates
             r = self.recvData()
-            while r:
+            while r and (r!="\r"):
                 print(r)
                 r = self.recvData()
 
@@ -177,9 +182,9 @@ class TCPClient:
 
         elif option == '7':
             hashtag = input("Enter hashtag: #")
-            self.sendData()
+            self.sendData(hashtag)
             r = self.recvData()
-            while r:
+            while r and (r!="\r"):
                 print(r)
                 r = self.recvData()
 

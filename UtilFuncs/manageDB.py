@@ -105,7 +105,6 @@ class sqliteDB:
         return (res[0], handle)
 
     def add_user(self, user: User, password):
-        h = user.handle
 
         insert_command = "INSERT INTO users VALUES (?, ?, ?)"
 
@@ -162,7 +161,6 @@ class sqliteDB:
         self.cur.execute(insert_command, (tweet_text, user.handle,))
         self.commit_changes()
 
-        print("New tweet: %s tweeted '%s'" % (user.handle, tweet_text))
         insert_command = "SELECT COUNT(*) FROM tweets"
         self.cur.execute(insert_command)
         t_id = self.cur.fetchone()[0]

@@ -1,3 +1,4 @@
+from enum import unique
 import os
 import sys
 sys.path.append(os.getcwd())
@@ -64,56 +65,85 @@ class ThreadServer(object):
 
     def login_client(self, conn_sock):
         received_data = self.recvData(conn_sock)
-        handle, password = received_data.split("ψ")
+        handle, password = received_data.split("\r")
         user = auth.logInUser(self.sqldb, handle, password)
         if user:
-            self.sendData('y')
-            self.sendData(user.name)
+            self.sendData(conn_sock, 'y')
+            self.sendData(conn_sock, user.name)
 
-            loggedIn_option = self.recvData()
+            loggedIn_option = self.recvData(conn_sock)
             self.main_page(conn_sock, user, loggedIn_option)
 
         else:
-            self.sendData('n')
+            self.sendData(conn_sock, 'n')
             self.login_client(conn_sock)
 
 
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
         print("Received registration: ",handle)
-        if not self.sqldb.user_exists(handle):
+        unique_user = self.sqldb.user_exists(handle)
+        print(unique_user)
+
+        if not unique_user:
+            logging.debug("unique user found")
             self.sendData(conn_sock, 'y')
-            name, password = self.recvData(conn_sock).split('ψ')
-            print(name,password)
+            logging.debug("sent ack: y")
+
+            namepass = self.recvData(conn_sock)
+            logging.debug("got name and password")
+            
+            name, password = namepass.split('\r')
+            print(name,password,handle)
             user = User(name, handle)
+
             self.sqldb.add_user(user, password)
-            self.sendData('y')
+            
+            self.sendData(conn_sock, 'y')
+
             print("Added user")
+            register_option = self.recvData(conn_sock)
+            logging.debug("got register option: " + register_option)
+            self.main_page(conn_sock, user, register_option)
+
         else:
             #User already exists
-            print("Already exists")
-            self.sendData('n')
+            logging.debug("Already exists")
+            self.sendData(conn_sock, 'n')
+            logging.debug("set ack: n")
             self.register_client(conn_sock)
             
 
 
     def send_tweets(self, conn_sock, user, tweets):
         for tweet in tweets:
+            print(tweet)
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
+        
+        # self.sendData(conn_sock, "\r")
 
 
-    def main_page(self, conn_sock, user, option):
+    def main_page(self, conn_sock, user:User, option):
 
         if option == '1':
+            
             self.sendData(conn_sock, 'y')
-            text = self.recvData()
+            logging.debug('sent ack')
+            
+            text = self.recvData(conn_sock)
+            logging.debug("received tweet")
+            
             self.sqldb.add_tweet(user, text)
+
+            logging.debug("New Tweet by %s: %s. . ."%(user.handle,text[:20]))
             # TODO to send ack
 
         elif option == '2':
             self.sendData(conn_sock, 'y')  # send 'y'
+
             handle = self.recvData(conn_sock)
+            logging.debug("searching for user")
             exist = self.sqldb.user_exists(handle)
 
             if exist:
@@ -133,6 +163,8 @@ class ThreadServer(object):
                     for tweet in tweets:
                         tweet = "%s tweeted %s" % (tweet[2], tweet[1])
                         self.sendData(conn_sock, tweet)
+                
+                self.sendData(conn_sock, "\r")
 
             else:
                 self.sendData(conn_sock, 'n')  # send 'y' for exist
@@ -140,7 +172,10 @@ class ThreadServer(object):
         elif option == '3':
             # get updates
             tweets = interact.get_feed(user, self.sqldb)
+            logging.debug("fetched tweets")
+            
             self.send_tweets(conn_sock, user, tweets)
+            self.sendData(conn_sock, "\r")
 
         elif option in ['4', '5']:
             handle = self.recvData(conn_sock)
@@ -148,9 +183,11 @@ class ThreadServer(object):
                 res = interact.follow_someone(user, handle, self.sqldb)
             else:
                 res = interact.unfollow_someone(user, handle, self.sqldb)
-
+            
+            print(res)
+            
             if 'No' in res:
-                self.sendData('n')
+                self.sendData(conn_sock, 'n')
             else:
                 self.sendData(conn_sock, res)
 
@@ -159,25 +196,32 @@ class ThreadServer(object):
             hashtag = input("Enter handle: ")
             self.sendData()
 
-            r = self.recvData()
+            r = self.recvData(conn_sock)
 
             print(r)
 
         elif option == '7':
             hashtag = self.recvData(conn_sock)
+            logging.debug("got: #%s" % hashtag)
+
             tweets = interact.getTweetsViaHashtag(user, hashtag, self.sqldb)
+
             if tweets:
                 self.send_tweets(conn_sock, user, tweets)
             else:
                 message = "No tweets exists with hashatg: %s" % (hashtag)
                 self.sendData(conn_sock, message)
 
+            self.sendData(conn_sock, "\r")
+
         elif option == '8':
             conn_sock.close()
             return
 
-        option = self.recvData()
-        self.main_page(option)
+        logging.debug("out of conditions")
+        option = self.recvData(conn_sock)
+        logging.debug("option")
+        self.main_page(conn_sock, user, option)
 
     def listenToClient(self, connection_socket, client_address):
         size = default_buffer
