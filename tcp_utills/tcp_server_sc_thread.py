@@ -36,7 +36,7 @@ class ThreadServer(object):
             conn_sock.send(len(data).to_bytes(7, 'big'))
             conn_sock.send(data)
         except socket.error as e:
-            print("Error sending data: %s" % e)
+            logging.warning("Error sending data: %s" % e)
             sys.exit(1)
 
     def recvData(self, conn_sock, size=default_buffer):
@@ -47,7 +47,7 @@ class ThreadServer(object):
             data_size = int.from_bytes(data_size, 'big')
             data = conn_sock.recv(size)
         except socket.error as e:
-            print("Error receiving data: %s" % e)
+            logging.warning("Error receiving data: %s" % e)
             sys.exit(1)
                 # break
             # if data:
@@ -85,27 +85,24 @@ class ThreadServer(object):
 
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
-        print("Received registration: ",handle)
+        logging.debug("Received registration: ",handle)
         unique_user = self.sqldb.user_exists(handle)
-        print(unique_user)
 
         if not unique_user:
             logging.debug("unique user found")
             self.sendData(conn_sock, 'y')
-            logging.debug("sent ack: y")
 
             namepass = self.recvData(conn_sock)
             logging.debug("got name and password")
             
             name, password = namepass.split('\r')
-            print(name,password,handle)
             user = User(name, handle)
 
             self.sqldb.add_user(user, password)
             
             self.sendData(conn_sock, 'y')
 
-            print("Added user")
+            logging.debug("Registered new user: %s" % user.handle)
             register_option = self.recvData(conn_sock)
             logging.debug("got register option: " + register_option)
             self.main_page(conn_sock, user, register_option)
@@ -121,11 +118,8 @@ class ThreadServer(object):
 
     def send_tweets(self, conn_sock, user, tweets):
         for tweet in tweets:
-            print(tweet)
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
-        
-        # self.sendData(conn_sock, "\r")
 
 
     def main_page(self, conn_sock, user:User, option):
@@ -164,9 +158,7 @@ class ThreadServer(object):
 
                 elif option_search == '3':
                     tweets = self.sqldb.get_tweets(handle)
-                    for tweet in tweets:
-                        tweet = "%s tweeted %s" % (tweet[2], tweet[1])
-                        self.sendData(conn_sock, tweet)
+                    self.send_tweets(conn_sock, user, tweets)
                 
                 self.sendData(conn_sock, "\r")
 
@@ -188,8 +180,6 @@ class ThreadServer(object):
             else:
                 res = interact.unfollow_someone(user, handle, self.sqldb)
             
-            print(res)
-            
             if 'No' in res:
                 self.sendData(conn_sock, 'n')
             else:
@@ -201,8 +191,6 @@ class ThreadServer(object):
             self.sendData()
 
             r = self.recvData(conn_sock)
-
-            print(r)
 
         elif option == '7':
             hashtag = self.recvData(conn_sock)
