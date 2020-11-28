@@ -72,9 +72,19 @@ class ThreadServer(object):
             self.login_client(conn_sock)
 
     # TODO
+    def register_client(self, conn_sock):
+        handle = self.recvData(conn_sock)
+        if self.sqldb.user_exists(handle) == False:
+            name, password = self.recvData(conn_sock)
+            user = User(name, handle)
+            self.sqldb.add_user(user, password)
+            self.sendData('y')
+        else:
+            #User already exists
+            self.sendData('n')
+            self.register_client(conn_sock)
+            
 
-    def register_client(self):
-        pass
 
     def send_tweets(self, conn_sock, user, tweets):
         for tweet in tweets:

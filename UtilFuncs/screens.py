@@ -55,17 +55,21 @@ class Interaction:
         return handle, password
         # Authenticate.logInUser(handle, password)
 
+    #TODO - Create method for handle
     @staticmethod
     def registerScreen():
         print("\nREGISTRATION SCREEN---------")
         name = input("Enter just your first name: ")
         handle = input("Enter your handle: ")
-        s = sqliteDB()
-        while s.user_exists(handle):
-            print("\nThat handle isn't available, try again!")
-            handle = input("Enter your handle: ")
-
         password = input("Enter your password: ")
+        return name, handle, password
+        #Server
+        # s = sqliteDB()
+        # while s.user_exists(handle):
+        #     print("\nThat handle isn't available, try again!")
+        #     handle = input("Enter your handle: ")
+
+
         user = User(name, handle)
         Authenticate.registerUser(user, password)
 

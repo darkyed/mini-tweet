@@ -56,7 +56,19 @@ class TCPClient:
 
     # TODO complete this
     def register_user(self):
-        pass
+        handle = interact.registerScreen()
+        self.sendData(handle)
+        message = self.recvData()
+        if message == 'n': 
+            print("User handle already exists! Please try with a new handle")
+            self.register_user()
+        else: 
+            #TODO - send name and password and need to interact
+            print("You are registered!")
+            option = auth.redirectToHomeScreen(handle)
+            option = str(option)
+            self.main_page(option)
+
 
     def login_user(self):
         # username
