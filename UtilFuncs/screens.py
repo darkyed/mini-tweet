@@ -50,7 +50,7 @@ class Interaction:
         password = input("Enter your password: ")
         return handle, password
 
-    # TODO - Create method for handle
+
     @staticmethod
     def getInputHandle():
         print("\nREGISTRATION SCREEN---------")

@@ -6,11 +6,7 @@ from UtilFuncs.manageDB import *
 from threading import Thread, active_count
 import logging
 import socket
-from enum import unique
 
-
-
-# from utilfuncs import *
 
 default_buffer = 32768
 
@@ -42,7 +38,6 @@ class ThreadServer(object):
 
     def recvData(self, conn_sock, size=default_buffer):
 
-        # while True:
         try:
             data_size = conn_sock.recv(7)
             data_size = int.from_bytes(data_size, 'big')
@@ -50,9 +45,6 @@ class ThreadServer(object):
         except socket.error as e:
             logging.warning("Error receiving data: %s" % e)
             sys.exit(1)
-            # break
-            # if data:
-            #     break
 
         return data.decode('utf-8')
 
@@ -230,19 +222,6 @@ class ThreadServer(object):
                     logging.debug("going to register")
                     self.register_client(connection_socket)
 
-                # TODO where to do threading?
-                # if data:
-                #     file_name = data.decode('utf-8')
-
-                #     # The following thread will heandle the data transfer
-
-                #     t = Thread(target=self.sendFile, args=(connection_socket, client_address, file_name))
-
-                #     t.start()
-                #     self.threads.append(t)
-
-                # else:
-                #     raise Exception('Client disconnected')
             except:
                 connection_socket.close()
                 return False

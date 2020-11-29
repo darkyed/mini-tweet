@@ -1,17 +1,12 @@
 import sys
 import os
-from time import sleep
 sys.path.append(os.getcwd())
 from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 from socket import *
 from UtilFuncs.User import User
-import threading
 import logging
-import json
 import time
 import os
-from UtilFuncs.manageDB import sqliteDB
-# sys.path.append('../')
 
 
 class TCPClient:
