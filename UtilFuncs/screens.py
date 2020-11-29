@@ -1,6 +1,6 @@
 from UtilFuncs.User import User
 from UtilFuncs.manageDB import sqliteDB
-
+import getpass
 
 class Interaction:
 
@@ -47,9 +47,8 @@ class Interaction:
     def logInScreen():
         print("\nLOGIN SCREEN---------")
         handle = input("Enter your handle: ")
-        # TODO hide password
         # https://stackoverflow.com/questions/9202224/getting-command-line-password-input-in-python
-        password = input("Enter your password: ")
+        password = getpass.getpass("Enter your Password: ")
         return handle, password
 
 

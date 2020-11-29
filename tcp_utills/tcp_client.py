@@ -123,8 +123,15 @@ class TCPClient:
 
         elif option == '2':
             received_data = self.recvData()
-            # TODO receive the registered users and print them
+            
             if received_data == 'y':
+                while True:
+                    res = self.recvData()
+                    if res == '\r': 
+                        break
+                    if res != self.user.handle:
+                        print(res)
+                
                 handle = interact.search_user()
                 self.sendData(handle)
                 exist = self.recvData()

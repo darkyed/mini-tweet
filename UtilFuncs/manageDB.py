@@ -3,7 +3,7 @@ from UtilFuncs.User import User
 import re
 
 
-# User:
+# Users:
 #     primary key ---> unique handle
 #     name
 #     password
@@ -91,6 +91,13 @@ class sqliteDB:
             return True
 
         return False
+
+    def getAllHandles(self):
+        select_command = "SELECT handle FROM users"
+        self.cur.execute(select_command)
+        res = self.cur.fetchall()
+        
+        return res
 
     def getUserViaHandle(self, handle):
         '''
