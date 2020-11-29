@@ -1,5 +1,10 @@
 from tcp_utills.tcp_client import TCPClient
 from UtilFuncs.manageDB import *
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(levelname)s] (%(threadName)-10s) %(message)s',
+                    )
+
 
 tables = ["users", "tweets", "hashtags", "follows"]
 s = sqliteDB()
@@ -25,52 +30,27 @@ name="saum"
 password="s"
 c2.register_user(handle,name,password)
 
-c1.tweet("peeyush #lodu")
-c2.tweet("peeyush #bhadwa")
+c1.tweet("peeyush #great")
+c2.tweet("peeyush #good")
 
-c1.follow(c2)
+c1.follow("saumitra")
+logging.debug("Rushil's feed")
 c1.feed()
+logging.debug("Saumitra's feed")
 c2.feed()
-c2.follow(c1)
+c2.follow("rushil")
+logging.debug("Saumitra's feed")
 c2.feed()
+c2.unfollow("rushil")
+logging.debug("Saumitra's feed")
+c2.feed()
+logging.debug("#great tweets")
+c1.searchviahshtag("great")
+logging.debug("#good tweets")
+c1.searchviahshtag("good")
 
 
 
 
 
 
-
-
-
-
-# tweets = ["assadfa ", "peeyush #lodu", "dagsdgsdg"]
-# authors_handles = ["peeyu", "saumitra", "rushil"]
-# author_names = ['A', 'B', 'C']
-# passwords = ['123']*3
-
-# users = []
-
-# for h,n,p in zip(authors_handles, author_names,passwords):
-#     u = User(n,h)
-#     users.append(u)
-#     s.add_user(u,p)
-
-# for u,t in zip(users,tweets):
-#     s.add_tweet(u,t)
-
-# s.add_follow(users[0],users[1])
-# print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
-# print("feed of %s: "%(users[0].handle))
-# Interaction.get_feed(users[0],s)
-# print("tweets with hashtag #%s"%("lodu"))
-# Interaction.getTweetsViaHashtag("lodu",s)
-# s.delete_follow(users[0],users[1])
-# print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
-# print("feed of %s: "%(users[0].handle))
-# Interaction.get_feed(users[0],s)
-# # command = "select * from tweets"
-# # s.cur.execute(command)
-
-# # res = s.cur.fetchall()
-# # for r in res:
-# #     print(r)

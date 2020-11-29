@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.getcwd())
 from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 from UtilFuncs.manageDB import *
-from threading import Thread, active_count
+from threading import Thread, active_count,Lock
 import logging
 import socket
 from enum import unique
@@ -30,6 +30,7 @@ class ThreadServer(object):
         self.threads = []
         self.dbname = "twitter.db"
         self.sqldb = sqliteDB(self.dbname)
+        self.Lock1=Lock()
 
     def sendData(self, conn_sock, data: str):
         try:
@@ -66,7 +67,13 @@ class ThreadServer(object):
 
             # listen to the incoming clients
             logging.debug("starting listen")
-            self.listenToClient(connection_socket, client_address)
+            # self.listenToClient(connection_socket, client_address)
+
+            t = Thread(target=self.listenToClient, args=(connection_socket, client_address))
+
+            t.start()
+            print("Thread started")
+            self.threads.append(t)
 
     def login_client(self, conn_sock):
         received_data = self.recvData(conn_sock)
@@ -86,7 +93,10 @@ class ThreadServer(object):
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
         logging.debug("Received registration: "+ handle)
+        # self.Lock1.acquire()
         user_in_db = self.sqldb.user_exists(handle)
+        # self.Lock1.release()
+        logging.debug("Sqldb chala hai: "+ handle)
 
         if not user_in_db:
             logging.debug("unique user found")
