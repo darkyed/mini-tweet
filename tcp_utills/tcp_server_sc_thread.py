@@ -133,6 +133,7 @@ class ThreadServer(object):
 
         elif option == '2':
             self.sendData(conn_sock, 'y')  # send 'y'
+            # TODO send the registered users one by one
 
             handle = self.recvData(conn_sock)
             logging.debug("searching for user")

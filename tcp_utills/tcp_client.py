@@ -123,7 +123,7 @@ class TCPClient:
 
         elif option == '2':
             received_data = self.recvData()
-
+            # TODO receive the registered users and print them
             if received_data == 'y':
                 handle = interact.search_user()
                 self.sendData(handle)

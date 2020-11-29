@@ -47,6 +47,8 @@ class Interaction:
     def logInScreen():
         print("\nLOGIN SCREEN---------")
         handle = input("Enter your handle: ")
+        # TODO hide password
+        # https://stackoverflow.com/questions/9202224/getting-command-line-password-input-in-python
         password = input("Enter your password: ")
         return handle, password
 
