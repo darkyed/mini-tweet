@@ -1,12 +1,13 @@
+import os
+import sys
+sys.path.append(os.getcwd())
 from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 from UtilFuncs.manageDB import *
 from threading import Thread, active_count
 import logging
 import socket
 from enum import unique
-import os
-import sys
-sys.path.append(os.getcwd())
+
 
 
 # from utilfuncs import *
@@ -84,7 +85,7 @@ class ThreadServer(object):
 
     def register_client(self, conn_sock):
         handle = self.recvData(conn_sock)
-        logging.debug("Received registration: ", handle)
+        logging.debug("Received registration: "+ handle)
         user_in_db = self.sqldb.user_exists(handle)
 
         if not user_in_db:
@@ -209,6 +210,11 @@ class ThreadServer(object):
 
         logging.debug("out of conditions")
         option = self.recvData(conn_sock)
+        while True:
+            if option:
+                break
+            option = self.recvData(conn_sock)
+
         logging.debug("option")
         self.main_page(conn_sock, user, option)
 
@@ -218,6 +224,7 @@ class ThreadServer(object):
             try:
                 # 1 or 2
                 data = self.recvData(connection_socket)
+                print(type(data),data)
                 if data == '1':
                     logging.debug("going to login")
                     self.login_client(connection_socket)

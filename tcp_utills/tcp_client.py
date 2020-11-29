@@ -1,4 +1,7 @@
-
+import sys
+import os
+from time import sleep
+sys.path.append(os.getcwd())
 from UtilFuncs.screens import Interaction as interact, Authenticate as auth
 from socket import *
 from UtilFuncs.User import User
@@ -8,9 +11,7 @@ import json
 import time
 import os
 from UtilFuncs.manageDB import sqliteDB
-import sys
-import os
-sys.path.append(os.getcwd())
+
 # sys.path.append('../')
 
 
@@ -21,6 +22,7 @@ class TCPClient:
         self.port = port
         self.client_socket = None
         self.user = None
+        self.login_done=False
 
     def start_connection(self):
 
@@ -32,13 +34,13 @@ class TCPClient:
 
         logging.debug("connected!")
 
-    def welcome_screen(self):
-        option = interact.welcome()
-        self.sendData(str(option))
-        if option == 1:
-            self.login_user()
-        if option == 2:
-            self.register_user()
+    # def welcome_screen(self):
+    #     option = interact.welcome()
+    #     self.sendData(str(option))
+    #     if option == 1:
+    #         self.login_user()
+    #     if option == 2:
+    #         self.register_user()
 
     def sendData(self, data: str):
         try:
@@ -63,9 +65,12 @@ class TCPClient:
 
         return data.decode('utf-8')
 
-    def register_user(self):
-        handle = interact.getInputHandle()
+    def register_user(self,handle,name,password):
+        # handle = interact.getInputHandle()
         # print(handle)
+        self.sendData('2')
+        sleep(1)
+        print("Sent")
         self.sendData(handle)
         message = self.recvData()
         if message == 'n':
@@ -73,26 +78,31 @@ class TCPClient:
             print("User handle already exists! Please try with a new handle")
             self.register_user()
         else:
-            name, password = interact.registerScreen()
+            # name, password = interact.registerScreen()
             self.user = User(name, handle)
             self.sendData(name + "\r" + password)
+            self.login_done=True
             print("Sent")
 
             ack = self.recvData()
 
             if ack == 'y':
                 print("You are registered!")
-                option = auth.redirectToHomeScreen(handle)
-                option = str(option)
-                print("you chose:", option)
-                self.main_page(option)
+            #     option = auth.redirectToHomeScreen(handle)
+            #     option = str(option)
+            #     print("you chose:", option)
+            #     self.main_page(option)
 
-            # FIXME else
+            # # FIXME else
 
-    def login_user(self):
+    def check_login(self):
+        return self.login_done
+
+    def login_user(self,handle,password):
         # username
-        handle, password = interact.logInScreen()
-
+        # handle, password = interact.logInScreen()
+        self.sendData('1')
+        sleep(1)
         self.sendData(handle + "\r" + password)
         # y n
         received_data = self.recvData(1)
@@ -102,97 +112,225 @@ class TCPClient:
             print("---Logged In---")
             name = self.recvData()
             self.user = User(name, handle)
-            option = auth.redirectToHomeScreen(handle)
-            option = str(option)
-            self.main_page(option)
+            self.login_done=True
+            # option = auth.redirectToHomeScreen(handle)
+            # option = str(option)
+            # self.main_page(option)
 
         else:
             print("\nSorry wrong credentials, try again!")
             time.sleep(1)
             self.login_user()
 
-    def main_page(self, option: str):
-        # 1
-        print(option)
-        self.sendData(option)
-
-        if option == '1':
-            received_data = self.recvData()
-            if received_data == 'y':
-                text = interact.tweet()
-                self.sendData(text)
-
-                # TODO acked by server
-                time.sleep(1)
-                print("Post was added. . .")
-
-        elif option == '2':
-            received_data = self.recvData()
-
-            if received_data == 'y':
-                handle = interact.search_user()
-                self.sendData(handle)
-                exist = self.recvData()
-
-                # found user
-                if exist == 'y':
-                    option_search = interact.searchscreen(handle)
-                    self.sendData(option_search)
-
-                    r = self.recvData()
-
-                    # 1 -> follow
-                    # 2 -> unfollow
-                    # 3 -> tweets
-                    while r and (r != "\r"):
-                        print(r)
-                        r = self.recvData()
-
-                else:
-                    print("User not found!")
-                    # Recurse
-                    self.main_page(option)
-
-        elif option == '3':
-            # get updates
-            r = self.recvData()
-            while r and (r != "\r"):
-                print(r)
-                r = self.recvData()
-
-        elif option in ['4', '5']:
-            handle = input("Enter the handle of user: ")
-            self.sendData(handle)
-
-            # get updates
-            r = self.recvData()
-            if r == 'n':
-                print("No such user exists, try again!")
-                self.main_page(option)
-            else:
-                print(r)
-
-        elif option == '6':
-            # TODO incomplete --- not implemented in Interacttion
-            hashtag = input("Enter handle: ")
-            self.sendData()
-
-            r = self.recvData()
-
-            print(r)
-
-        elif option == '7':
-            hashtag = input("Enter hashtag: #")
-            self.sendData(hashtag)
-            r = self.recvData()
-            while r and (r != "\r"):
-                print(r)
-                r = self.recvData()
-
-        elif option == '8':
-            print("\nLOGGED OUT--------")
-            self.client_socket.close()
+    def tweet(self,tweet_text):
+        if not self.check_login():
+            print("You have not logged in")
             return
 
-        option = auth.redirectToHomeScreen(self.user.handle)
-        self.main_page(option)
+        option='1'
+        self.sendData(option)
+        sleep(1)
+        received_data = self.recvData()
+        if received_data == 'y':
+            # text = interact.tweet()
+            self.sendData(tweet_text)
+
+            # TODO acked by server
+            time.sleep(1)
+            print("Post was added. . .")
+    
+    def search_user(self):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option='2'
+        self.sendData(option)
+        sleep(1)
+        
+        received_data = self.recvData()
+
+        if received_data == 'y':
+            handle = interact.search_user()
+            self.sendData(handle)
+            exist = self.recvData()
+
+            # found user
+            if exist == 'y':
+                option_search = interact.searchscreen(handle)
+                self.sendData(option_search)
+
+                r = self.recvData()
+
+                # 1 -> follow
+                # 2 -> unfollow
+                # 3 -> tweets
+                while r and (r != "\r"):
+                    print(r)
+                    r = self.recvData()
+
+            else:
+                print("User not found!")
+                # Recurse
+    
+    def feed(self):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option='3'
+        self.sendData(option)
+        sleep(1)
+
+        # get updates
+        r = self.recvData()
+        while r and (r != "\r"):
+            print(r)
+            r = self.recvData()
+
+    def follow(self,handle):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option='4'
+        self.sendData(option)
+        sleep(1)
+
+        self.sendData(handle)
+
+        # get updates
+        r = self.recvData()
+        if r == 'n':
+            print("No such user exists, try again!")
+            self.main_page(option)
+        else:
+            print(r)
+    
+    def unfollow(self,handle):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option='5'
+        self.sendData(option)
+        sleep(1)
+
+        self.sendData(handle)
+        # get updates
+        r = self.recvData()
+        if r == 'n':
+            print("No such user exists, try again!")
+            self.main_page(option)
+        else:
+            print(r)
+    
+    def searchviahshtag(self,hashtag):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option = '7'
+        self.sendData(option)
+        sleep(1)
+
+        self.sendData(hashtag)
+        r = self.recvData()
+        while r and (r != "\r"):
+            print(r)
+            r = self.recvData()
+    
+    def logout(self):
+        if not self.check_login():
+            print("You have not logged in")
+            return
+        option='8'
+        self.sendData(option)
+        print("\nLOGGED OUT--------")
+        self.client_socket.close()
+        return
+    
+    
+
+
+
+    # def main_page(self, option: str):
+    #     # 1
+    #     print(option)
+    #     self.sendData(option)
+
+    #     if option == '1':
+    #         received_data = self.recvData()
+    #         if received_data == 'y':
+    #             text = interact.tweet()
+    #             self.sendData(text)
+
+    #             # TODO acked by server
+    #             time.sleep(1)
+    #             print("Post was added. . .")
+
+    #     elif option == '2':
+    #         received_data = self.recvData()
+
+    #         if received_data == 'y':
+    #             handle = interact.search_user()
+    #             self.sendData(handle)
+    #             exist = self.recvData()
+
+    #             # found user
+    #             if exist == 'y':
+    #                 option_search = interact.searchscreen(handle)
+    #                 self.sendData(option_search)
+
+    #                 r = self.recvData()
+
+    #                 # 1 -> follow
+    #                 # 2 -> unfollow
+    #                 # 3 -> tweets
+    #                 while r and (r != "\r"):
+    #                     print(r)
+    #                     r = self.recvData()
+
+    #             else:
+    #                 print("User not found!")
+    #                 # Recurse
+    #                 self.main_page(option)
+
+    #     elif option == '3':
+    #         # get updates
+    #         r = self.recvData()
+    #         while r and (r != "\r"):
+    #             print(r)
+    #             r = self.recvData()
+
+    #     elif option in ['4', '5']:
+    #         handle = input("Enter the handle of user: ")
+    #         self.sendData(handle)
+
+    #         # get updates
+    #         r = self.recvData()
+    #         if r == 'n':
+    #             print("No such user exists, try again!")
+    #             self.main_page(option)
+    #         else:
+    #             print(r)
+
+    #     elif option == '6':
+    #         # TODO incomplete --- not implemented in Interacttion
+    #         hashtag = input("Enter handle: ")
+    #         self.sendData()
+
+    #         r = self.recvData()
+
+    #         print(r)
+
+    #     elif option == '7':
+    #         hashtag = input("Enter hashtag: #")
+    #         self.sendData(hashtag)
+    #         r = self.recvData()
+    #         while r and (r != "\r"):
+    #             print(r)
+    #             r = self.recvData()
+
+    #     elif option == '8':
+    #         print("\nLOGGED OUT--------")
+    #         self.client_socket.close()
+    #         return
+
+    #     option = auth.redirectToHomeScreen(self.user.handle)
+    #     self.main_page(option)
