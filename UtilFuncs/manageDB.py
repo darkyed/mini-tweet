@@ -31,7 +31,7 @@ def find_hashtag(text):
 class sqliteDB:
     def __init__(self, dbName='twitter.db') -> None:
         self.db = dbName
-        self.conn = sql.connect(dbName)
+        self.conn = sql.connect(dbName,check_same_thread=False)
         self.cur = self.conn.cursor()
 
     def create_table(self, table_name="users"):
