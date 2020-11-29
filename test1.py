@@ -9,10 +9,10 @@ for t in tables:
 s.close_connection()
 
 c1 = TCPClient()
-# c2= TCPClient()
+c2= TCPClient()
 
 c1.start_connection()
-# c2.start_connection()
+c2.start_connection()
 
 # cl.welcome_screen()
 handle="rushil"
@@ -23,16 +23,16 @@ c1.register_user(handle,name,password)
 handle="saumitra"
 name="saum"
 password="s"
-# c2.register_user(handle,name,password)
+c2.register_user(handle,name,password)
 
 c1.tweet("peeyush #lodu")
-# c2.tweet("peeyush #bhadwa")
+c2.tweet("peeyush #bhadwa")
 
-# c1.follow(c2)
-# c1.feed()
-# c2.feed()
-# c2.follow(c1)
-# c2.feed()
+c1.follow(c2)
+c1.feed()
+c2.feed()
+c2.follow(c1)
+c2.feed()
 
 
 

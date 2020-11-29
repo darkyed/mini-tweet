@@ -224,7 +224,7 @@ class ThreadServer(object):
             try:
                 # 1 or 2
                 data = self.recvData(connection_socket)
-                print(type(data),data)
+                # print(type(data),data)
                 if data == '1':
                     logging.debug("going to login")
                     self.login_client(connection_socket)

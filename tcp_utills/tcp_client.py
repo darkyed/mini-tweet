@@ -76,7 +76,7 @@ class TCPClient:
         if message == 'n':
             time.sleep(1)
             print("User handle already exists! Please try with a new handle")
-            self.register_user()
+            self.login_user(handle,password)
         else:
             # name, password = interact.registerScreen()
             self.user = User(name, handle)
