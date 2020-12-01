@@ -76,7 +76,7 @@ class TCPClient:
         if message == 'n':
             time.sleep(1)
             print("User handle already exists! Please try with a new handle")
-            self.login_user(handle,password)
+            # self.login_user(handle,password)
         else:
             # name, password = interact.registerScreen()
             self.user = User(name, handle)
@@ -120,7 +120,7 @@ class TCPClient:
         else:
             print("\nSorry wrong credentials, try again!")
             time.sleep(1)
-            self.login_user()
+            # self.login_user(handle,password)
 
     def tweet(self,tweet_text):
         if not self.check_login():
