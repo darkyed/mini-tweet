@@ -54,7 +54,7 @@ class ThreadServer(object):
         self.server_socket.listen(10)
         while True:
             connection_socket, client_address = self.server_socket.accept()
-            connection_socket.settimeout(60)
+            connection_socket.settimeout(600)
 
             # listen to the incoming clients
             logging.debug("starting listen")
@@ -188,7 +188,6 @@ class ThreadServer(object):
 
         elif option == '6':
             follower_list=self.sqldb.show_followers(user)
-            print(follower_list)
             self.send_followers(conn_sock,user,follower_list)
             self.sendData(conn_sock,'\r')    
             
