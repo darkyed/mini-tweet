@@ -218,20 +218,15 @@ class ThreadServer(object):
 
     def listenToClient(self, connection_socket, client_address):
         size = default_buffer
-        while True:
-            try:
-                # 1 or 2
-                data = self.recvData(connection_socket)
-                if data == '1':
-                    logging.debug("going to login")
-                    self.login_client(connection_socket)
-                elif data == '2':
-                    logging.debug("going to register")
-                    self.register_client(connection_socket)
-
-            except:
-                connection_socket.close()
-                return False
+        data = self.recvData(connection_socket)
+        if data == '1':
+            logging.debug("going to login")
+            self.login_client(connection_socket)
+        elif data == '2':
+            logging.debug("going to register")
+            self.register_client(connection_socket)
+        
+        print(client_address,"Logged out")
 
 
 if __name__ == "__main__":

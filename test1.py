@@ -9,7 +9,7 @@ s.create_table("tweets")
 s.create_table("follows")
 s.create_table("hashtags")
 
-tweets = ["assadfa ", "peeyush #lodu", "dagsdgsdg"]
+tweets = ["assadfa ", "peeyush #great", "dagsdgsdg"]
 authors_handles = ["peeyu", "saumitra", "rushil"]
 author_names = ['A', 'B', 'C']
 passwords = ['123']*3
@@ -28,8 +28,8 @@ s.add_follow(users[0],users[1])
 print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
 print("feed of %s: "%(users[0].handle))
 Interaction.get_feed(users[0],s)
-print("tweets with hashtag #%s"%("lodu"))
-Interaction.getTweetsViaHashtag("lodu",s)
+print("tweets with hashtag #%s"%("great"))
+Interaction.getTweetsViaHashtag("great",s)
 s.delete_follow(users[0],users[1])
 print("Following List: of %s"%(users[0].handle),s.get_following_list(users[0]))
 print("feed of %s: "%(users[0].handle))
