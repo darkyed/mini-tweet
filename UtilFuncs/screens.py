@@ -41,13 +41,12 @@ class Interaction:
             return Interaction.loggedInOptions(handle)
         else:
             return str(option)
-            # Authenticate.loggedInChoice(handle, option)
+
 
     @staticmethod
     def logInScreen():
         print("\nLOGIN SCREEN---------")
         handle = input("Enter your handle: ")
-        # https://stackoverflow.com/questions/9202224/getting-command-line-password-input-in-python
         password = getpass.getpass("Enter your Password: ")
         return handle, password
 
@@ -114,8 +113,6 @@ class Interaction:
 
     @staticmethod
     def unfollow_someone(user, follow_handle, s: sqliteDB):
-        # follow_handle=input("Who do you want to unfollow: ")
-
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
                 s.delete_follow(user.handle, follow_handle)
@@ -127,8 +124,6 @@ class Interaction:
 
     @staticmethod
     def delete_follower(user, follow_handle, s: sqliteDB):
-        # follow_handle=input("Who do you want to unfollow: ")
-
         if s.user_exists(follow_handle):
             if s.following_exists_delete(follow_handle,user):
                 s.delete_follow(follow_handle, user.handle)
@@ -138,9 +133,6 @@ class Interaction:
                 return "That handle doesn't don't follow you"
         else:
             return "No such user exists"
-    
-    # @staticmethod
-    # def show_followers(user,s : sqliteDB):
 
 
     @staticmethod

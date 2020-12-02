@@ -58,7 +58,6 @@ class ThreadServer(object):
 
             # listen to the incoming clients
             logging.debug("starting listen")
-            # self.listenToClient(connection_socket, client_address)
             t = Thread(target=self.listenToClient, args=(connection_socket, client_address))
 
             t.start()
@@ -115,9 +114,8 @@ class ThreadServer(object):
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
     
-    def send_followers(self, conn_sock, user, follower_lis):
-        for f in follower_lis:
-            # tweet = "%s tweeted %s" % (tweet[2], tweet[1])
+    def send_followers(self, conn_sock, user, follower_list):
+        for f in follower_list:
             self.sendData(conn_sock, f[0])
 
     def main_page(self, conn_sock, user: User, option):
@@ -134,7 +132,6 @@ class ThreadServer(object):
 
             logging.debug("New Tweet by %s: %s. . ." %
                           (user.handle, text[:20]))
-            # TODO to send ack
 
         elif option == '2':
             self.sendData(conn_sock, 'y')  # send 'y'
@@ -143,7 +140,7 @@ class ThreadServer(object):
             for i in res:
                 self.sendData(conn_sock, i[0])
             self.sendData(conn_sock, "\r")
-            # print()
+            
             handle = self.recvData(conn_sock)
             logging.debug("searching for user")
             exist = self.sqldb.user_exists(handle)
@@ -190,21 +187,11 @@ class ThreadServer(object):
                 self.sendData(conn_sock, res)
 
         elif option == '6':
-            # TODO incomplete --- not implemented in Interacttion
-            # handle = self.recvData(conn_sock)
             follower_list=self.sqldb.show_followers(user)
             print(follower_list)
             self.send_followers(conn_sock,user,follower_list)
-            # print("Follower list")
-            # for name in follower_list:
-            #     print(name)
             self.sendData(conn_sock,'\r')    
-            # res = interact.delete_follower(user, handle, self.sqldb)
-
-            # if 'No' in res:
-            #     self.sendData(conn_sock, 'n')
-            # else:
-            #     self.sendData(conn_sock, res)
+            
 
         elif option == '7':
             hashtag = self.recvData(conn_sock)
