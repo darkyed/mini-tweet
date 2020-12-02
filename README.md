@@ -78,7 +78,7 @@ You can have muliple clients running on a single server.
 
 
 ### Finite State Machine for Server
-If you are interested in checking out thow the server functions, and how it proceeds as the client requests something from it, then see the file at [FSM Server](fsm_server.pdf)
+If you are interested in checking out thow the server functions, and how it proceeds as the client requests something from it, then see the file at [FSM Server](server_fsm.pdf)
 
 
 ### Running without Mininet
