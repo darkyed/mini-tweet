@@ -172,6 +172,10 @@ class sqliteDB:
         for hashtag in find_hashtag(tweet_text):
             self.cur.execute(insert_command, (hashtag, t_id))
             self.commit_changes()
+    def show_followers(self,user):
+        insert_command="SELECT follower FROM follows where gawd=?"
+        self.cur.execute(insert_command, (user.handle,))
+        return self.cur.fetchall()
 
     def commit_changes(self):
         self.conn.commit()

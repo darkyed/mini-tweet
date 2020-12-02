@@ -128,6 +128,10 @@ class ThreadServer(object):
         for tweet in tweets:
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
+    def send_followers(self, conn_sock, user, follower_lis):
+        for f in follower_lis:
+            # tweet = "%s tweeted %s" % (tweet[2], tweet[1])
+            self.sendData(conn_sock, f[0])
 
     def main_page(self, conn_sock, user: User, option):
 
@@ -194,11 +198,10 @@ class ThreadServer(object):
                 self.sendData(conn_sock, res)
 
         elif option == '6':
-            # TODO incomplete --- not implemented in Interacttion
-            hashtag = input("Enter handle: ")
-            self.sendData()
-
-            r = self.recvData(conn_sock)
+            follower_list=self.sqldb.show_followers(user)
+            # print(follower_list)
+            self.send_followers(conn_sock,user,follower_list)
+            self.sendData(conn_sock,'\r')  
 
         elif option == '7':
             hashtag = self.recvData(conn_sock)

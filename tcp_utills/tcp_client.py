@@ -245,6 +245,15 @@ class TCPClient:
         self.client_socket.close()
         return
     
+    def getallfollowers(self):
+        option ='6'
+        self.sendData(option)
+        sleep(1)
+        print("Follower list:")
+        r = self.recvData()
+        while r and (r != "\r"):
+            print(r)
+            r = self.recvData()
     
 
 
