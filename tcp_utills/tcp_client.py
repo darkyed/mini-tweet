@@ -123,7 +123,7 @@ class TCPClient:
 
         elif option == '2':
             received_data = self.recvData()
-            
+            print("These users are registered:")
             if received_data == 'y':
                 while True:
                     res = self.recvData()
@@ -131,7 +131,7 @@ class TCPClient:
                         break
                     if res != self.user.handle:
                         print(res)
-                
+                print()
                 handle = interact.search_user()
                 self.sendData(handle)
                 exist = self.recvData()
@@ -176,12 +176,15 @@ class TCPClient:
 
         elif option == '6':
             # TODO incomplete --- not implemented in Interacttion
-            hashtag = input("Enter handle: ")
-            self.sendData()
+            # handle = input("Enter the handle of user: ")
+            # self.sendData(handle)
 
+            # get updates
+            print("Follower list:")
             r = self.recvData()
-
-            print(r)
+            while r and (r != "\r"):
+                print(r)
+                r = self.recvData()
 
         elif option == '7':
             hashtag = input("Enter hashtag: #")

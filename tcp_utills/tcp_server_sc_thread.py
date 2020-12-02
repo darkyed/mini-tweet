@@ -114,6 +114,11 @@ class ThreadServer(object):
         for tweet in tweets:
             tweet = "%s tweeted %s" % (tweet[2], tweet[1])
             self.sendData(conn_sock, tweet)
+    
+    def send_followers(self, conn_sock, user, follower_lis):
+        for f in follower_lis:
+            # tweet = "%s tweeted %s" % (tweet[2], tweet[1])
+            self.sendData(conn_sock, f[0])
 
     def main_page(self, conn_sock, user: User, option):
 
@@ -138,7 +143,7 @@ class ThreadServer(object):
             for i in res:
                 self.sendData(conn_sock, i[0])
             self.sendData(conn_sock, "\r")
-
+            # print()
             handle = self.recvData(conn_sock)
             logging.debug("searching for user")
             exist = self.sqldb.user_exists(handle)
@@ -186,10 +191,20 @@ class ThreadServer(object):
 
         elif option == '6':
             # TODO incomplete --- not implemented in Interacttion
-            hashtag = input("Enter handle: ")
-            self.sendData()
+            # handle = self.recvData(conn_sock)
+            follower_list=self.sqldb.show_followers(user)
+            print(follower_list)
+            self.send_followers(conn_sock,user,follower_list)
+            # print("Follower list")
+            # for name in follower_list:
+            #     print(name)
+            self.sendData(conn_sock,'\r')    
+            # res = interact.delete_follower(user, handle, self.sqldb)
 
-            r = self.recvData(conn_sock)
+            # if 'No' in res:
+            #     self.sendData(conn_sock, 'n')
+            # else:
+            #     self.sendData(conn_sock, res)
 
         elif option == '7':
             hashtag = self.recvData(conn_sock)

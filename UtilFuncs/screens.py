@@ -24,7 +24,7 @@ class Interaction:
             3. Get Updates
             4. Follow users via handle
             5. Unfollow users via handle
-            6. Delete a follower via handle
+            6. Show all followers
             7. Search tweets using hashtag
             8. LOG-OUT
             """
@@ -118,12 +118,30 @@ class Interaction:
 
         if s.user_exists(follow_handle):
             if s.following_exists(user, follow_handle):
-                s.delete_follow(user, follow_handle)
+                s.delete_follow(user.handle, follow_handle)
                 return "Deleted follower"
             else:
                 return "You don't follow him/her"
         else:
             return "No such user exists"
+
+    @staticmethod
+    def delete_follower(user, follow_handle, s: sqliteDB):
+        # follow_handle=input("Who do you want to unfollow: ")
+
+        if s.user_exists(follow_handle):
+            if s.following_exists_delete(follow_handle,user):
+                s.delete_follow(follow_handle, user.handle)
+                print("Deleted")
+                return "Deleted following"
+            else:
+                return "That handle doesn't don't follow you"
+        else:
+            return "No such user exists"
+    
+    # @staticmethod
+    # def show_followers(user,s : sqliteDB):
+
 
     @staticmethod
     def getTweetsViaHashtag(user, hashtag, s: sqliteDB):

@@ -135,11 +135,11 @@ class sqliteDB:
         self.cur.execute(select_command, t)
         return self.cur.fetchall()
 
-    def delete_follow(self, user: User, following: str):
+    def delete_follow(self, user_handle, following: str):
         self.cur.execute("DELETE FROM follows where gawd=? and follower=?",
-                         (following, user.handle,))
+                         (following, user_handle,))
         self.commit_changes()
-        print("Now %s doesn't follow %s" % (user.handle, following))
+        print("Now %s doesn't follow %s" % (user_handle, following))
 
     def add_follow(self, user: User, following: str):
         if not self.following_exists(user, following):
@@ -152,6 +152,17 @@ class sqliteDB:
 
     def following_exists(self, user: User, following: str):
         handle = user.handle
+        following_handle = following
+        select_command = "SELECT * FROM follows WHERE gawd=? and follower=?"
+        t = (following_handle, handle,)
+        self.cur.execute(select_command, t)
+        if self.cur.fetchone():
+            return True
+
+        return False
+    
+    def following_exists_delete(self, handle, following: str):
+        # handle = user.handle
         following_handle = following
         select_command = "SELECT * FROM follows WHERE gawd=? and follower=?"
         t = (following_handle, handle,)
@@ -178,7 +189,14 @@ class sqliteDB:
         for hashtag in find_hashtag(tweet_text):
             self.cur.execute(insert_command, (hashtag, t_id))
             self.commit_changes()
-
+    
+    def show_followers(self,user):
+        insert_command="SELECT follower FROM follows where gawd=?"
+        self.cur.execute(insert_command, (user.handle,))
+        return self.cur.fetchall()
+        # print("Follower list")
+        # for name in lis:
+        #     print(name)
     def commit_changes(self):
         self.conn.commit()
 
