@@ -162,7 +162,6 @@ class sqliteDB:
         return False
     
     def following_exists_delete(self, handle, following: str):
-        # handle = user.handle
         following_handle = following
         select_command = "SELECT * FROM follows WHERE gawd=? and follower=?"
         t = (following_handle, handle,)
@@ -182,7 +181,6 @@ class sqliteDB:
         insert_command = "SELECT COUNT(*) FROM tweets"
         self.cur.execute(insert_command)
         t_id = self.cur.fetchone()[0]
-        # print(tweet_text,"t_id: ",t_id)
 
         insert_command = "INSERT INTO hashtags (tag, t_id) VALUES (?, ?)"
 
@@ -194,9 +192,7 @@ class sqliteDB:
         insert_command="SELECT follower FROM follows where gawd=?"
         self.cur.execute(insert_command, (user.handle,))
         return self.cur.fetchall()
-        # print("Follower list")
-        # for name in lis:
-        #     print(name)
+
     def commit_changes(self):
         self.conn.commit()
 

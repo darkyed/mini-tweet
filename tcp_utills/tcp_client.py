@@ -60,7 +60,6 @@ class TCPClient:
 
     def register_user(self):
         handle = interact.getInputHandle()
-        # print(handle)
         self.sendData(handle)
         message = self.recvData()
         if message == 'n':
@@ -82,10 +81,8 @@ class TCPClient:
                 print("you chose:", option)
                 self.main_page(option)
 
-            # FIXME else
 
     def login_user(self):
-        # username
         handle, password = interact.logInScreen()
 
         self.sendData(handle + "\r" + password)
@@ -117,7 +114,6 @@ class TCPClient:
                 text = interact.tweet()
                 self.sendData(text)
 
-                # TODO acked by server
                 time.sleep(1)
                 print("Post was added. . .")
 
@@ -175,11 +171,7 @@ class TCPClient:
                 print(r)
 
         elif option == '6':
-            # TODO incomplete --- not implemented in Interacttion
-            # handle = input("Enter the handle of user: ")
-            # self.sendData(handle)
-
-            # get updates
+            # get the list of followers
             print("Follower list:")
             r = self.recvData()
             while r and (r != "\r"):
